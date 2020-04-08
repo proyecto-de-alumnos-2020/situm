@@ -41,7 +41,7 @@
     "@ionic/storage": "2.1.3",
     "angularfire2": "^5.0.0-rc.10",
     "angularx-qrcode": "^1.1.7",
-    "cordova-android": "^6.4.0",
+    "cordova-android": "8.1.0",
     "cordova-base64-to-gallery": "^4.1.3",
     "cordova-browser": "^4.1.0",
     "cordova-ios": "4.5.4",
@@ -74,9 +74,9 @@
     "node": "^8.11.1",
     "npm": "^5.6.0",
     "promise-polyfill": "^8.0.0",
-    "rxjs": "^6.2.0",
+    "rxjs": "^6.0.0",
     "rxjs-compat": "^6.2.0",
-    "situm-cordova-plugin-official": "file:../situm-cordova-plugin",
+    "situm-cordova-plugin-official": "git+https://github.com/situmtech/situm-cordova-plugin.git",
     "sw-toolbox": "3.6.0",
     "tar-stream": "^1.5.5",
     "zone.js": "0.8.18"
@@ -105,8 +105,12 @@
       },
       "cordova-plugin-cocoapod-support": {},
       "situm-cordova-plugin-official": {},
-      "cordova.plugins.diagnostic": {},
-      "cordova-plugin-camera": {},
+      "cordova.plugins.diagnostic": {
+        "ANDROID_SUPPORT_VERSION": "28.+"
+      },
+      "cordova-plugin-camera": {
+        "ANDROID_SUPPORT_V4_VERSION": "27.+"
+      },
       "cordova-plugin-gyroscope": {},
       "cordova-plugin-qrscanner": {},
       "cordova-plugin-qrcodejs": {},
@@ -117,8 +121,8 @@
       "cordova-plugin-network-information": {}
     },
     "platforms": [
-      "android",
-      "ios"
+      "ios",
+      "android"
     ]
   }
 }
