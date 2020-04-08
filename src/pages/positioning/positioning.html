@@ -1,0 +1,227 @@
+<ion-header>
+  <!--
+    [ngStyle]="{'background-color': item.colorCode}">
+    [ngStyle]="{'background-color': item.colorCode}"
+  -->
+  <!-- <ion-navbar color="changeableColour"> -->
+  <ion-navbar [ngStyle]="{'background-color': changeableColour}">
+    <button ion-button menuToggle icon-only>
+      <ion-icon color="changeableColour" name='menu'></ion-icon>
+    </button>
+    <ion-title *ngIf="isFinalMode" color="white">{{currentWorkspace.name}}</ion-title>
+    <ion-title *ngIf="!isFinalMode" color="white">Authoring Tool</ion-title>
+    <ion-buttons end>
+      <ion-label style="width:30% !important" *ngIf="nameUserLogged" style="text-align:right; padding-bottom:14px" color="light"
+        stacked>{{nameUserLogged}}</ion-label>
+    </ion-buttons>
+    <ion-buttons end>
+      <button style="text-align: right" *ngIf="nameUserLogged" end ion-button icon-only clear (click)="logout()">
+        <!-- <ion-icon color="light" ios="ios-close" md="md-close" item-right></ion-icon> -->
+        <ion-icon color="light" ios="ios-log-out" md="md-log-out" item-right></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<!--<ion-content style="background: none transparent;">-->
+<ion-content>
+
+  <div *ngIf="!mapLoaded" style="width: 100%; height:70vh; background-image: url('assets/img/backgroundLoggedUserFinal.png') !important;
+  background-size: 100% !important; background-repeat: no-repeat !important; background-position: center !important;"></div>
+
+  <!-- <ion-grid>
+    <ion-row>
+      <ion-col col-12 style="background-color:red">
+
+      </ion-col>
+    </ion-row>
+    <ion-col col-12 style="background-color: green">
+      <ion-fab right top *ngIf="currentFloor && !qrAutorizado" #fab>
+        <button ion-fab [ngStyle]="{'background-color': changeableColour}">
+          <ion-icon ios="ios-add-circle" md="md-add-circle"></ion-icon>
+        </button>
+      </ion-fab>
+    </ion-col>
+  </ion-grid> -->
+
+  <!--<img style="width: 500px; height: 500px;"src="assets/img/backgroundLoggedUser.png">-->
+  <!--<ion-row *ngIf="posActual.x">
+    <ion-label>
+      <b>Posición actual</b>
+    </ion-label>
+    <ion-label stacked>
+      <b>Coord.X:</b> {{posActual.x}}</ion-label>
+    <ion-label stacked>
+      <b>Coord.Y:</b> {{posActual.y}}</ion-label>
+  </ion-row> -->
+  <!--<ion-row >
+    <div *ngIf="currentFloor">
+      <ion-col col-2>
+        <ion-label>Piso:</ion-label>
+      </ion-col>
+      <ion-col col-6>
+        <ion-select disabled="{{floors.length == 1}}" [(ngModel)]="nroPisoActual" (ionChange)="cambiarPiso($event)">
+          <ion-option *ngFor="let floor of floors" value="{{floor.level}}">
+            <div *ngIf="floor.level == 0">Planta Baja</div>
+            <div *ngIf="floor.level != 0">{{floor.level}}</div>
+          </ion-option>
+        </ion-select>
+      </ion-col>
+      <ion-col col-2>
+        <button ion-button item-start full small color="light" (click)="startPositioning()" [disabled]="mapHidden()">POS</button>
+      </ion-col>
+      <ion-col col-2>
+        <button ion-button item-end full small color="dark" (click)="stopPositioning()" [disabled]="positioningStopped()">!POS</button>
+      </ion-col>
+    </div>
+  </ion-row>-->
+
+  <!--<ion-row>
+    <ion-col>
+      <button ion-button small full color="light" (click)="showRoute()" [disabled]="routeConditionsNotSet()">Show default route</button>
+      <ion-item>
+        <ion-label>Accessible</ion-label>
+        <ion-checkbox [checked]="accessible" (ionChange)="updateAccessible()" [disabled]="routeConditionsNotSet()"></ion-checkbox>
+      </ion-item>
+    </ion-col>
+  </ion-row>-->
+  <!--
+  <ion-row>
+    <ion-col col-6>
+      <button ion-button item-start full small color="light" (click)="requestNavigation()" [disabled]="navigationConditionsNotSet()">Nav Updates</button>
+    </ion-col>
+    <ion-col col-6>
+      <button ion-button item-end full small color="dark" (click)="removeNavigation()" [disabled]="navigationConditionsNotSet()">Remove Nav</button>
+    </ion-col>
+  </ion-row>
+
+  <ion-row>
+    <ion-col col-6>
+      <button ion-button item-start full small color="light" (click)="clear()">Clear </button>
+    </ion-col>
+    <ion-col col-6>
+      <button ion-button item-end full small color="dark" (click)="stablish()">Stablish cache</button>
+    </ion-col>
+  </ion-row>-->
+  <!-- <qrcode [qrdata]="modelQRPoi" [size]="80" [level]="'M'" style="opacity:0;"></qrcode>
+  <img style="width: 50px; height: 50px;" [src]="modelQRPoi"/> -->
+  <ion-row class="map">
+    <ion-col class="map">
+      <!--<ion-fab right top *ngIf="navigating" #fab>
+        <button ion-fab color="danger" (click)="stopNavigation()">
+          <ion-icon ios="ios-square" md="md-square"></ion-icon>
+        </button>
+      </ion-fab>-->
+      <ion-fab style="width: 90px;" right bottom #fab>
+        <button style="background-color: transparent; box-shadow: none; transition:inherit" ion-fab color="danger" (click)="preventClick()">
+        </button>
+      </ion-fab>
+      <ion-fab right top #fab>
+        <ion-row>
+          <ion-col>
+            <button ion-fab *ngIf="currentFloor && positioning == false" color="white" style="text-align: center" (click)="checkGPSEnabled()">
+              <img style="width: 44px; height: 44px;" src="assets/img/playLocateInversePrimary.png">
+            </button>
+            <button ion-fab *ngIf="currentFloor && positioning == true" color="white" style="text-align: center" (click)="stopPositioning()">
+              <img style="width: 44px; height: 44px;" src="assets/img/stopLocateInverseDanger.png">
+            </button>
+          </ion-col>
+        </ion-row>
+        <ion-row style="padding-top:2vh;">
+          <ion-col>
+            <button color="white" *ngIf="currentFloor && positioning == true && !isFinalMode && mustShowAddPoiButton" ion-fab (click)="closeFab(fab);saveCurrentPosition()">
+              <!-- <ion-icon color="myBlueColour" ios="ios-add-circle" md="md-add-circle"></ion-icon> -->
+              <!-- [ngStyle]="{'color': userColour}" -->
+              <!-- <img style="width: 44px; height: 44px;" src="assets/img/stopLocateInverseDanger.png"> -->
+              <!-- this.icon = "assets/img/"+"pinPoiQR"+this.colorString+".png"; -->
+              <!-- <img style="width: 44px; height: 44px;" src={{icon}}> -->
+              <img style="width: 44px; height: 44px; position:fixed;" src={{iconAddUserColour}}>
+              <ion-icon style="z-index: 999;padding-top: 16px;padding-left: 28px;font-weight: bold;font-size: 28px;" ios="ios-add" md="md-add"></ion-icon>
+              <!-- <ion-icon style="z-index: 999;padding-top: 10px;padding-left: 14px; color:#f7f7f7" ios="ios-add-circle" md="md-add-circle"></ion-icon> -->
+            </button>
+            <!-- <button color="white" *ngIf="currentFloor && positioning == true && !isFinalMode" ion-fab (click)="closeFab(fab);saveCurrentPosition()"> -->
+            <!-- <ion-icon color="myBlueColour" ios="ios-add-circle" md="md-add-circle"></ion-icon> -->
+            <!-- [ngStyle]="{'color': userColour}" -->
+            <!-- <img style="width: 44px; height: 44px;" src="assets/img/stopLocateInverseDanger.png"> -->
+            <!-- this.icon = "assets/img/"+"pinPoiQR"+this.colorString+".png"; -->
+            <!-- <img style="width: 44px; height: 44px;" src={{icon}}> -->
+            <!-- <img style="width: 44px; height: 44px; position:fixed;" src={{iconAddUserColour}}>
+                <ion-icon ios="ios-add" md="md-add"></ion-icon>
+              </button> -->
+          </ion-col>
+        </ion-row>
+      </ion-fab>
+      <ion-fab left top *ngIf="currentFloor && !qrAutorizado" #fab>
+        <button ion-fab [ngStyle]="{'background-color': changeableColour}" (click)="toggleClickeable()">
+          <ion-icon name="md-arrow-dropdown-circle"></ion-icon>
+        </button>
+        <ion-fab-list side="bottom">
+          <ion-item *ngIf="isCurrentWorkspaceOwner" text-wrap style="border-bottom: 1px solid #dedede; min-width: 69vw;"
+            class="fondoBlanco">
+            <ion-label style="color: black">
+              <b>Estado:</b>
+            </ion-label>
+            <ion-select class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" [(ngModel)]="currentWorkspace.status.idStatus"
+              (ionChange)="changeWorkspaceStatus($event, fab)">
+              <ion-option text-wrap *ngFor="let status of possiblesStatusesStrings" value="{{status}}">
+                <div *ngIf='status == "EdicionDelCreador"'>Edición del creador</div>
+                <div *ngIf='status == "EdicionColaborativa"'>Edición colaborativa</div>
+                <div *ngIf='status == "EdicionDelCreadorVersionFinal"'>Edición del creador - versión final</div>
+                <div *ngIf='status == "VersionFinalPublica"'>Version final pública</div>
+              </ion-option>
+            </ion-select>
+          </ion-item>
+          <button style="border-bottom: 1px solid #dedede;" *ngIf="isCurrentWorkspaceOwner" ion-item (click)="closeFab(fab);shareViaQR()">
+            <ion-icon color="dark" ios="ios-barcode" md="md-barcode" item-start></ion-icon>
+            Compartir workspace via QR
+          </button>
+          <ion-item style="border-bottom: 1px solid #dedede; min-width: 69vw;" class="fondoBlanco">
+            <ion-label style="color: black"><b>Piso:</b></ion-label>
+            <ion-select class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" disabled="{{floors.length == 1   || !canChangeFloor}}"
+              [(ngModel)]="nroPisoActual" (ionChange)="cambiarPiso($event, fab)">
+              <ion-option *ngFor="let floor of floors" value="{{floor.level}}">
+                <div *ngIf="floor.level == 0">Planta Baja</div>
+                <div *ngIf="floor.level != 0">{{floor.level}}° Piso</div>
+              </ion-option>
+            </ion-select>
+          </ion-item>
+          <button style="border-bottom: 1px solid #dedede;" *ngIf="isCurrentWorkspaceOwner && !isFinalMode" ion-item (click)="closeFab(fab);openPoisFilter()">
+            <ion-icon ios="ios-funnel" md="md-funnel" item-start></ion-icon>
+            Filtrar PoI por creadores
+          </button>
+          <!-- <button style="border-bottom: 1px solid #dedede;" class="alturaBotonFlotante" ion-item *ngIf="currentPosition" (click)="closeFab(fab);comenzarNavegacion()">
+            <ion-icon color="black" name="navigate"></ion-icon>
+            Comenzar navegación
+          </button>-->
+          <button *ngIf='currentWorkspace.status.idStatus =="VersionFinalPublica"' style="border-bottom: 1px solid #dedede;" class="alturaBotonFlotante" ion-item (click)="closeFab(fab);iniciarQRScannerToPoi()">
+            <ion-icon color="black" name="camera" item-start></ion-icon>
+            Escanear código QR
+          </button>
+          <!-- <ion-item style="border-bottom: 1px solid #dedede;" *ngIf="isCurrentWorkspaceOwner">
+            <ion-icon *ngIf="isCurrentWorkspaceOwner" ios="ios-eye" md="md-eye" item-start></ion-icon>
+            <ion-icon *ngIf="!isCurrentWorkspaceOwner" ios="ios-eye" md="md-eye" item-start></ion-icon>
+            <ion-label> Ver como:
+              <b>Aplicación final</b>
+            </ion-label>
+            <ion-toggle disabled="{{!isCurrentWorkspaceOwner}}" color="myBlueColour" [(ngModel)]="isFinal" (ionChange)="changeVisualMode()"></ion-toggle>
+          </ion-item> -->
+          <button style="border-bottom: 1px solid #dedede;" *ngIf='isCurrentWorkspaceOwner && currentWorkspace.status.idStatus=="VersionFinalPublica"'
+            class="alturaBotonFlotante" ion-item (click)="closeFab(fab);exportQRImages()">
+            <ion-icon name="document" item-start ></ion-icon>
+            Exportar Imágenes QR
+          </button>
+          <!-- <button style="border-bottom: 1px solid #dedede;" *ngIf="!isFinalMode" class="alturaBotonFlotante" ion-item (click)="closeFab(fab);printMarkers()">
+            <ion-icon color="myBlueColour" name="home"></ion-icon>
+            Imprimir markers
+          </button>
+          <button style="border-bottom: 1px solid #dedede;" *ngIf="!isFinalMode" class="alturaBotonFlotante" ion-item (click)="closeFab(fab);printPolylines()">
+            <ion-icon color="myBlueColour" name="home"></ion-icon>
+            Imprimir Polylines
+          </button> -->
+        </ion-fab-list>
+      </ion-fab>
+      <div #map id="map">
+      </div>
+    </ion-col>
+  </ion-row>
+</ion-content>

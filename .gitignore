@@ -1,0 +1,43 @@
+*~
+*.sw[mnpcod]
+*.log
+*.tmp
+*.tmp.*
+log.txt
+
+# NPM files
+npm-debug.log*
+node_modules/
+tmp/
+temp/
+
+# Preprocessors cache files
+.sourcemaps/
+.sass-cache/
+.tmp/
+hooks/
+
+# Ionic 3 plugins files
+platforms/
+plugins/
+plugins/android.json
+plugins/ios.json
+www/
+
+# Trash data
+$RECYCLE.BIN/
+.DS_Store
+Thumbs.db
+UserInterfaceState.xcuserstate
+info\.txt
+*.DS_Store
+
+.versions/
+coverage/
+dist/
+
+.idea/
+*.sublime-project
+*.sublime-workspace
+.vscode/
+src/services/situm.ts

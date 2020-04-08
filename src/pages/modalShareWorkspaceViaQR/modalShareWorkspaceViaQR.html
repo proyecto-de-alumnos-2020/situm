@@ -1,0 +1,36 @@
+<ion-card>
+  <ion-card-content>
+    <div style="text-align: center">
+      <ion-icon style="text-align: center; font-size: 14px;" ios="ios-arrow-dropleft" md="md-arrow-dropleft"></ion-icon>
+      <b> Seleccione un color para el colaborador </b>
+      <ion-icon style="text-align: center; font-size: 14px;" ios="ios-arrow-dropright" md="md-arrow-dropright"></ion-icon>
+    </div>
+    <ion-slides style="text-align: center" (ionSlideDidChange)="slideChanged()" initialSlide="7" pager>
+      <ion-slide *ngFor="let colour of coloursList">
+        <div style="height: 80px; width:100%">
+          <button ion-button icon-only clear [ngStyle]="{'color': 'color !important' }">
+            <ion-icon [ngStyle]="{'color': colour}" style="text-align: center; font-size: 40px;" ios="ios-pin" md="md-pin"></ion-icon>
+          </button>
+        </div>
+      </ion-slide>
+    </ion-slides>
+    <ion-row>
+      <button ion-button block icon-end small color="myBlueColour" style="width:100%;" (click)="showQR()">
+        VER QR
+        <ion-icon color="white" ios="ios-barcode" md="md-barcode"></ion-icon>
+      </button>
+    </ion-row>
+    <div *ngIf="mostrarQR">
+      <p style="text-align: center">
+        <b style="text-align: center">Escanee el QR para unirse al workspace</b>
+      </p>
+      <qrcode alt="qrCode" [qrdata]="stringToSearchWorkspace" [size]="256" [level]="'M'"></qrcode>
+      <ion-item>
+        <p>
+          <b>Nombre del workspace:</b>
+        </p>
+        <p>{{workspace.name}}</p>
+      </ion-item>
+    </div>
+  </ion-card-content>
+</ion-card>

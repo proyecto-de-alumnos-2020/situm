@@ -1,0 +1,37 @@
+<ion-menu [content]="content">
+    <ion-header>
+        <ion-navbar color="myBlueColour">
+            <button ion-button menuToggle icon-only>
+                <ion-icon name='menu'></ion-icon>
+            </button>
+            <ion-title>Menú</ion-title>
+        </ion-navbar>
+    </ion-header>
+    <ion-content>
+        <button ion-item text-wrap menuToggle (click)="scanToImportWorkspace();$event.stopPropagation();">
+            <ion-icon color="myBlueColour" style="font-size: 26px;" ios="ios-camera" md="md-camera" item-start></ion-icon>
+            Unirse a un workspace vía QR
+        </button>
+        <button ion-item text-wrap menuToggle (click)="createWorkspace();$event.stopPropagation();">
+            <ion-icon color="myBlueColour" style="font-size: 26px;" ios="ios-add" md="md-add" item-start></ion-icon>
+            Crear workspace
+        </button>
+        <button ion-item text-wrap menuToggle (click)="openModal('misWorkspaces')">
+            <ion-icon color="myBlueColour" style="font-size: 26px;" ios="ios-list-box" md="md-list-box" item-start></ion-icon>
+            Mis workspaces
+        </button>
+        <button ion-item text-wrap menuToggle (click)="openModal('workspacesDondeColaboro')">
+            <ion-icon color="myBlueColour" style="font-size: 26px;" ios="ios-list" md="md-list" item-start></ion-icon>
+            Workspaces en los que colaboro
+        </button>
+        <button ion-item text-wrap menuToggle (click)="openModal('aplicacionesFinales')">
+            <ion-icon color="myBlueColour" style="font-size: 26px;" ios="ios-apps" md="md-apps" item-start></ion-icon>
+            Aplicaciones finales
+        </button>
+        <button ion-item text-wrap menuToggle (click)="killApp()">
+            <ion-icon color="myBlueColour" ios="ios-close-circle" md="md-close-circle" item-start></ion-icon>
+            Cerrar Authoring Tool
+        </button>
+    </ion-content>
+</ion-menu>
+<ion-nav [root]="rootPage" #content></ion-nav>

@@ -1,0 +1,29 @@
+.swiper-container-horizontal > .swiper-pagination
+{
+    top          : 40px; //Change accordingly
+    z-index         : 99 !important;
+}
+
+page-modalShareWorkspace{
+    img{
+        max-width: 86% !important;
+        height: 86% !important;
+        margin-left: 7%;
+    }
+    qrcode{
+        img{
+            display: none;
+        }
+        canvas{
+            width: 86% !important;
+            height: 86% !important;
+            margin-left: 7%;
+        }
+        img:not[src=""]{
+            height: auto !important;
+            margin-left: 7% !important;
+            width: 86% !important;
+            display: block !important;
+        }
+    }
+}

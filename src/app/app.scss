@@ -1,0 +1,60 @@
+// http://ionicframework.com/docs/v2/theming/
+
+
+// App Global Sass
+// --------------------------------------------------
+// Put style rules here that you want to apply globally. These
+// styles are for the entire app and not just one component.
+// Additionally, this file can be also used as an entry point
+// to import other Sass files to be included in the output CSS.
+//
+// Shared Sass variables, which can be used to adjust Ionic's
+// default Sass variables, belong in "theme/variables.scss".
+//
+// To declare rules for a specific mode, create a child rule
+// for the .md, .ios, or .wp mode classes. The mode class is
+// automatically applied to the <body> element in the app.
+ion-modal{
+   background: rgba(0,0,0,0.5);
+  
+}
+.item {
+  min-height: 3rem; /* <- this can be whatever you need */
+}
+// .modal-not-fullscreen-size{
+//     position: absolute !important;
+//     //display: block !important;
+//     width: 100% !important;
+//     //left: 2% !important;
+//     //right: 2% !important;
+//     //max-height: 96% !important;
+//     height: 100% !important;
+//     //top: 2% !important;
+//     //border-radius: 5px !important;
+//     border-color: 1px solid grey !important;
+//     //$modal-inset-box-shadow-color:rgba(0, 0, 0, 0.5) !important;
+//     display: flex !important;
+//     justify-content: center !important;
+//     align-items: center !important;
+//     height: 100%;
+// }
+/*BARRA VISIBLE*/
+::-webkit-scrollbar {
+  width: auto;
+}
+::-webkit-scrollbar-thumb {
+  background: color($colors, 'myBlueColour');
+}
+
+//PARA EL COLOR DINAMICO DEBO MODIFICAR LOS ESTILOS
+.toolbar-background { //SINO TOMA EL COLOR DEFAULT
+  background: none;
+}
+.bar-button-menutoggle-md ion-icon { //SINO TOMA COLOR GRIS POR DEFAULT
+  color:white !important;
+}
+
+.toolbar-title {
+  color: white !important;
+}
+

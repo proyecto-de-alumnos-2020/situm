@@ -1,0 +1,82 @@
+<ion-card>
+  <ion-card-title *ngIf="editionMode" style="text-align: center">Editando POI</ion-card-title>
+  <div *ngIf="poi.infoHtml !='' && !editionMode">
+    <img [src]="poi.infoHtml">
+    <ion-fab right top #fab disabled>
+      <button ion-fab *ngIf="poi.infoHtml !=''" color="white">
+        <img style="width: 44px; height: 44px;" src={{icon}}>
+      </button>
+    </ion-fab>
+  </div>
+
+  <ion-card-content>
+    <div *ngIf="!editionMode">
+      <ion-card-title>
+        {{poi.poiName}}
+      </ion-card-title>
+      <p>{{poi.category}}</p>
+      <p>
+        <b>Usuario creador: </b>{{poi.creator}}</p>
+      <p>
+        <b>Se brinda el PoI: </b>{{poi.asociatedTrigger}}
+      </p>
+      <ion-list *ngIf="mustShowSwitchPoiVisibility">
+        <ion-item>
+          <ion-icon ios="ios-eye" md="md-eye" item-start></ion-icon>
+          <ion-label>
+            <b>POI visible:</b>
+          </ion-label>
+          <ion-checkbox color="myBlueColour" item-end [(ngModel)]="poi.visible" (ionChange)="changePoiVisual(poi.visible)"></ion-checkbox>
+        </ion-item>
+      </ion-list>
+    </div>
+    <ion-item *ngIf="editionMode" style="padding-left:0px; padding-top: 2%">
+      <ion-label color="myBlueColour" stacked>Nombre / Título:</ion-label>
+      <ion-input #inputNamePoi type="text" min=1 max=20 placeholder="Este es el título del PoI" [(ngModel)]="editedPoi.poiName">{{editedPoi.poiName}}</ion-input>
+    </ion-item>
+    <ion-item *ngIf="editionMode" style="padding-left:0px;">
+      <ion-label color="myBlueColour" stacked>Descripción:</ion-label>
+      <ion-textarea type="text" min=5 max=500 placeholder="Esta es una descripción del PoI" [(ngModel)]="editedPoi.category">{{editedPoi.category}}</ion-textarea>
+    </ion-item>
+    <ion-item *ngIf="editionMode" style="padding-left:0px;">
+      <ion-label style="color: black">Brindar el PoI:</ion-label>
+      <ion-select style="max-width: 100%;" (ionChange)="cambioFormaBrindarPoi($event)"
+        class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" [(ngModel)]="editedPoi.asociatedTrigger">
+        <ion-option *ngFor="let option of options" value="{{ option }}">
+          {{ option }}
+        </ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-grid *ngIf="editionMode">
+      <ion-row>
+        <ion-col col-6>
+          <button [disabled]="editedPoi.poiName=='' || editedPoi.category==''" color="myBlueColour" ion-button small icon-start item-end
+            (click)="saveEditedPoi(editedPoi);" style="margin-left:20%; margin-right: 20%; width: 60%;">
+            Guardar
+          </button>
+        </ion-col>
+        <ion-col col-6>
+          <button color="danger" ion-button small icon-start item-end (click)="switchEditionMode()" style="margin-left:20%; margin-right: 20%; width: 60%;">
+            Cancelar
+          </button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    <ion-grid *ngIf="!editionMode && mustShowEditAndDelete">
+      <ion-row>
+        <ion-col col-6>
+          <button color="myBlueColour" ion-button small icon-start item-end (click)="switchEditionMode();" style="margin-left:20%; margin-right: 20%; width: 60%;">
+            <ion-icon ios="ios-create" md="md-create"></ion-icon>
+            Editar
+          </button>
+        </ion-col>
+        <ion-col col-6>
+          <button color="danger" ion-button small icon-start item-end (click)="deletePoi(poi)" style="margin-left:20%; margin-right: 20%; width: 60%;">
+            <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
+            Eliminar
+          </button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>

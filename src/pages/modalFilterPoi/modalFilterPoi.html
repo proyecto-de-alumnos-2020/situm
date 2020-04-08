@@ -1,0 +1,36 @@
+<ion-card>
+  <ion-card-content>
+    <ion-item-divider style="height: 40px; text-align: center;" color="myBlueColour">
+      <b style="color:white; font-size: 16px">Usuarios creadores</b>
+    </ion-item-divider>
+    <ion-scroll scrollY="true" style="height:38vh !important; overflow: hidden !important;">
+      <ion-list *ngIf="creators.length > 0">
+        <ion-item *ngFor="let creator of creators; let even = even" [color]="even? 'greyItemList' : 'whiteItemList'">
+          <ion-label>{{creator.name}}</ion-label>
+          <ion-checkbox *ngIf="creator.colour =='#000000'" color="blackPoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#2E7D32'" color="strongGreenPoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#7B1FA2'" color="strongPurplePoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#9E9E9E'" color="softGreyPoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#66BB6A'" color="softGreenPoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#304FFE'" color="softBluePoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#1576C9'" color="myBlueColour" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#283593'" color="strongBluePoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#424250'" color="strongGreyPoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#860000'" color="strongRedPoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#E040FB'" color="softPinkPoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#F06292'" color="strongPinkPoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#F44336'" color="softRedPoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#FF6D00'" color="strongOrangePoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+          <ion-checkbox *ngIf="creator.colour =='#FF7043'" color="softOrangePoi" item-end [(ngModel)]="creator.checked"></ion-checkbox>
+        </ion-item>
+      </ion-list>
+      <ion-item *ngIf="creators.length == 0">
+        <ion-label style="text-align: center">Aún no hay PoI creados</ion-label>
+      </ion-item>
+    </ion-scroll>
+    <div style="text-align: center">
+      <button ion-button color="danger" (click)="cancelFilterPois()">Cancelar</button>
+      <button ion-button color="myBlueColour" (click)="acceptFilterPois()">Aceptar</button>
+    </div>
+  </ion-card-content>
+</ion-card>

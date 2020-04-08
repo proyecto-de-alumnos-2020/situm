@@ -1,0 +1,17 @@
+<ion-card>
+  <ion-card-content>
+    <ion-card-title style="text-align: center">Curso UNLP 2019</ion-card-title>
+    <ion-grid>
+      <ion-row>
+        <ion-col col-12 style="position:initial !important;">
+          <div style="text-align: center">
+            <ion-item>
+              <ion-input #input type="text" min=5 max=20 placeholder="Ingrese aquí el código de desbloqueo" [(ngModel)]="codigo"></ion-input>
+            </ion-item>
+            <button ion-button color="myBlueColour" (click)="desbloquear()">Desbloquear!</button>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>

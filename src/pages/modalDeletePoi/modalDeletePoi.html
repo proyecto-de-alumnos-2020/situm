@@ -1,0 +1,11 @@
+<ion-card style="margin-top: 36vh; height: 22vh; width:90%; margin-left:3vh;">
+  <ion-card-content>
+    <div style="text-align: center;">
+      <b>¿Está seguro que desea eliminar el PoI "{{poi.poiName}}" ?</b>
+    </div>
+    <div style="text-align: center">
+      <button ion-button color="danger" (click)="answer(false)">Cancelar</button>
+      <button ion-button color="myBlueColour" (click)="answer(true)">Aceptar</button>
+    </div>
+  </ion-card-content>
+</ion-card>

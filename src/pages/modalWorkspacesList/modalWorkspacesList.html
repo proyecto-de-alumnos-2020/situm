@@ -1,0 +1,33 @@
+<ion-card>
+  <ion-card-content>
+
+    <ion-item-divider style="height: 40px; text-align: center;" color="myBlueColour">
+      <b *ngIf="tipoWorkspaces == 'misWorkspaces'" style="color:white; font-size: 14px; text-align: center">Mis workspaces</b>
+      <b *ngIf="tipoWorkspaces == 'workspacesDondeColaboro'" style="color:white; font-size: 14px; text-align: center">Colaboro en</b>
+      <b *ngIf="tipoWorkspaces == 'aplicacionesFinales'" style="color:white; font-size: 14px; text-align: center">Aplicaciones finales</b>
+      <button ion-button item-right icon-only clear (click)="showInformation()">
+        <ion-icon style="font-size: 26px;" color="whiteItemList" ios="ios-information-circle" md="md-information-circle"></ion-icon>
+      </button>
+    </ion-item-divider>
+    <ion-scroll scrollY="true" style="height:64vh !important; overflow: hidden !important;">
+      <ion-list *ngIf="workspaces">
+        <button ion-item *ngFor="let ws of workspaces; let even = even" [color]="even? 'greyItemList' : 'whiteItemList'" (click)="openWorkspaceByStatus(ws);$event.stopPropagation();">
+          <ion-icon *ngIf="ws.status.idStatus=='EdicionDelCreador'" style="font-size: 26px;" color="strongGreyPoi" ios="ios-create"
+            md="md-create" item-start></ion-icon>
+          <ion-icon *ngIf="ws.status.idStatus=='EdicionColaborativa'" style="font-size: 26px;" color="strongOrangePoi" ios="ios-create"
+            md="md-create" item-start></ion-icon>
+          <ion-icon *ngIf="ws.status.idStatus=='EdicionDelCreadorVersionFinal'" style="font-size: 26px;" color="strongPurplePoi" ios="ios-create"
+            md="md-create" item-start></ion-icon>
+          <ion-icon *ngIf="ws.status.idStatus=='VersionFinalPublica'" style="font-size: 26px;" color="strongGreenPoi" ios="ios-create"
+            md="md-create" item-start></ion-icon>
+          {{ws.name}}
+        </button>
+      </ion-list>
+      <div *ngIf="workspaces.length == 0">
+        <p *ngIf="tipoWorkspaces == 'misWorkspaces'" style="color:gray; font-size: 14px; text-align: center; padding-top: 2%;">No hay workscpaces propias</p>
+        <p *ngIf="tipoWorkspaces == 'workspacesDondeColaboro'" style="color:gray; font-size: 14px; text-align: center; padding-top: 2%;">No colaboras en nigún workspace</p>
+        <p *ngIf="tipoWorkspaces == 'aplicacionesFinales'" style="color:gray; font-size: 14px; text-align: center; padding-top: 2%">No ha importado ninguna aplicación final</p>
+      </div>
+    </ion-scroll>
+  </ion-card-content>
+</ion-card>

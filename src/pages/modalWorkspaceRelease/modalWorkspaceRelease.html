@@ -1,0 +1,76 @@
+<ion-card>
+  <ion-card-content>
+    <p style="text-align: justify">Para publicar el workspace debe indicar la estrategia con la que se mostrar&aacute;n los marcadores en el mapa de acuerdo al mecanismo seleccionado cuando fueron creados. </p>
+    <ion-list style="border-bottom: 1px solid #dedede; margin-bottom: 2vh">
+      <ion-item text-wrap style="min-width: 69vw;" class="fondoBlanco">
+        <ion-label style="color: black">
+          para<b> WLAN </b>mostrar:
+        </ion-label>
+        <ion-select class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" [(ngModel)]="estrategiaSeleccionadaParaMostrarPOIWLAN">
+          <ion-option disabled selected value="undefined">
+            <ion-label>Seleccionar</ion-label>
+          </ion-option>
+          <ion-option text-wrap [disabled]='estrategia=="MostrarMarcadorPorProximidad"' *ngFor="let estrategia of estrategiasParaMostrarPOIWLAN"
+            value="{{estrategia}}">
+            <div *ngIf='estrategia=="MostrarMarcadorPorProximidad"'>Por cercan&iacute;a</div>
+            <div *ngIf='estrategia=="MostrarMarcadorSiempre"'>Siempre</div>
+          </ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-item text-wrap style="min-width: 69vw;" class="fondoBlanco">
+        <ion-label style="color: black">
+          para<b> QR </b>mostrar:
+        </ion-label>
+        <ion-select class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" [(ngModel)]="estrategiaSeleccionadaParaMostrarPOIQR">
+          <ion-option disabled selected value="undefined">
+            <ion-label>Seleccionar</ion-label>
+          </ion-option>
+          <ion-option [disabled]='strat=="MostrarMarcadorPorProximidad" || strat=="MostrarMarcadorPorEscaneo"' text-wrap *ngFor="let strat of estrategiasParaMostrarPOIQR"
+            value="{{strat}}">
+            <div *ngIf='strat=="MostrarMarcadorPorProximidad"'>Por Cercan&iacute;a</div>
+            <div *ngIf='strat=="MostrarMarcadorPorEscaneo"'>Por escaneo</div>
+            <div *ngIf='strat=="MostrarMarcadorSiempre"'>Siempre</div>
+          </ion-option>
+        </ion-select>
+      </ion-item>
+    </ion-list>
+    <p style="text-align: justify">Además deberá indicar la estrategia con la que se brindar&aacute; la informaci&oacute;n que contienen los marcadores de acuerdo al mecanismo seleccionado cuando fueron creados.
+    </p>
+    <ion-list style="margin-bottom: 2vh">
+      <ion-item text-wrap style="min-width: 69vw;" class="fondoBlanco">
+        <ion-label style="color: black">
+          para<b> WLAN </b>brindar:
+        </ion-label>
+        <ion-select class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" [(ngModel)]="estrategiaSeleccionadaParaMostrarInformacionPOIWLAN">
+          <ion-option disabled selected value="undefined">
+            <ion-label>Seleccionar</ion-label>
+          </ion-option>
+          <ion-option text-wrap [disabled]='stratInfo=="MostrarInformacionPorProximidad"' *ngFor="let stratInfo of estrategiasParaMostrarInformacionPOIWLAN"
+            value="{{stratInfo}}">
+            <div *ngIf='stratInfo=="MostrarInformacionPorProximidad"'>Por Cercan&iacute;a</div>
+            <div *ngIf='stratInfo=="MostrarInformacionSiempreQueEstePosicionadoEnElEdificio"'>Siempre que est&eacute; posicionado en el lugar</div>
+          </ion-option>
+        </ion-select>
+      </ion-item>
+      <!-- POIS CON QR -->
+      <ion-item text-wrap style="min-width: 69vw;" class="fondoBlanco">
+        <ion-label style="color: black">
+          para<b> QR </b>brindar:
+        </ion-label>
+        <ion-select class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" [(ngModel)]="estrategiaSeleccionadaParaMostrarInformacionPOIQR">
+          <ion-option disabled selected value="undefined">
+            <ion-label>Seleccionar</ion-label>
+          </ion-option>
+          <ion-option text-wrap *ngFor="let stratInfoQR of estrategiasParaMostrarInformacionPOIQR"
+          value="{{stratInfoQR}}">
+            <div *ngIf='stratInfoQR=="MostrarInformacionPorEscaneo"'>Por Escaneo</div>
+          </ion-option>
+        </ion-select>
+      </ion-item>
+    </ion-list>
+    <div style="text-align: center">
+      <button ion-button color="danger" (click)="cancelar()">Cancelar</button>
+      <button ion-button color="myBlueColour" [disabled]="estrategiasCompletas()==false" (click)="cerrarWorkspace()">Aceptar</button>
+    </div>
+  </ion-card-content>
+</ion-card>
