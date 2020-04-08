@@ -26,7 +26,10 @@ import { ModalWorkspaceRelease } from '../pages/modalWorkspaceRelease/modalWorks
 
 //Imports de Firebase
 import { AngularFireModule } from 'angularfire2';
-import { AngularFireDatabaseModule, AngularFireDatabase } from 'angularfire2/database';
+import {
+  AngularFireDatabaseModule,
+  AngularFireDatabase,
+} from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 
 //Imports de mis servicios
@@ -36,7 +39,7 @@ import { NuevoPoiPage } from '../pages/nuevoPoi/nuevoPoi';
 import { MapService } from '../services/map.service';
 import { LoginService } from '../services/login.service';
 import { WorkspaceService } from '../services/workspace.service';
-import { PositioningService } from '../services/positioning.service'
+import { PositioningService } from '../services/positioning.service';
 import { Network } from '@ionic-native/network';
 
 //Imports de Camara
@@ -50,13 +53,7 @@ import { FileTransfer } from '@ionic-native/file-transfer';
 import { File } from '@ionic-native/file';
 import { BlockScreenPage } from '../pages/blockScreen/blockScreen';
 
-export const firebaseConfig = {
-  apiKey: "AIzaSyBAPfMwIa55eNikj5fazXGzKJ2u8V3kdkc",
-  authDomain: "indoornavigation-1521493148276.firebaseapp.com",
-  databaseURL: "https://indoornavigation-1521493148276.firebaseio.com",
-  storageBucket: "indoornavigation-1521493148276.appspot.com",
-  messagingSenderId: '489127968348"'
-};
+import { firebaseConfig } from '../firebaseConfig';
 
 @NgModule({
   declarations: [
@@ -76,7 +73,7 @@ export const firebaseConfig = {
     ModalFilterPoi,
     ModalExitApp,
     ModalWorkspaceRelease,
-    BlockScreenPage
+    BlockScreenPage,
   ],
   imports: [
     BrowserModule,
@@ -84,7 +81,7 @@ export const firebaseConfig = {
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireDatabaseModule,
     AngularFireAuthModule,
-    QRCodeModule
+    QRCodeModule,
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -102,7 +99,7 @@ export const firebaseConfig = {
     ModalFilterPoi,
     ModalExitApp,
     ModalWorkspaceRelease,
-    BlockScreenPage
+    BlockScreenPage,
   ],
   providers: [
     StatusBar,
@@ -123,7 +120,7 @@ export const firebaseConfig = {
     QRScanner,
     FileTransfer,
     File,
-    Network
-  ]
+    Network,
+  ],
 })
-export class AppModule { }
+export class AppModule {}

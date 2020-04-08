@@ -35,6 +35,16 @@ So, `config.xml` file should contain one line like this:
 
     <plugin name="situm-cordova-plugin" spec="file:../situm-cordova-plugin" />
 
+## Firebase Configuration
+
+Firebase configuration file can be found it `src/firebaseConfig.ts`. In order to define a new firebase project you should go to https://console.firebase.google.com/ and:
+
+- Create a new project.
+
+- Register a web project.
+
+- Copy the given credentials to `src/firebaseConfig.ts`.
+
 ## Run Android version
 
 - **Run from command line**: `$ ionic cordova run android -l --ssl`
