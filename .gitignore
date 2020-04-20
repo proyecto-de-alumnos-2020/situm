@@ -40,4 +40,3 @@ dist/
 *.sublime-project
 *.sublime-workspace
 .vscode/
-src/services/situm.ts
