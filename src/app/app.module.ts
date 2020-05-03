@@ -26,10 +26,7 @@ import { ModalWorkspaceRelease } from '../pages/modalWorkspaceRelease/modalWorks
 
 //Imports de Firebase
 import { AngularFireModule } from 'angularfire2';
-import {
-  AngularFireDatabaseModule,
-  AngularFireDatabase,
-} from 'angularfire2/database';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 
 //Imports de mis servicios

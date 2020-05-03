@@ -1,5 +1,12 @@
 import { Component } from '@angular/core';
-import { Platform, ViewController, AlertController, LoadingController, ToastController, ModalController, App } from 'ionic-angular';
+import {
+  Platform,
+  ViewController,
+  AlertController,
+  LoadingController,
+  ToastController,
+  ModalController,
+} from 'ionic-angular';
 import { LoginService } from '../../services/login.service';
 import { ModalExitApp } from '../../pages/modalExitApp/modalExitApp';
 
@@ -18,12 +25,11 @@ export class UserModel {
 export class ModalLogin {
   public unregisterBackButtonAction: any;
   private allowClose = false;
-  private dismissing = true;
-  private spamming = true;
+
   private lastBack: number;
   formLogin = true;
-  errorRegister = "";
-  errorLogin = "";
+  errorRegister = '';
+  errorLogin = '';
   userModel: UserModel;
   constructor(
     public platform: Platform,
@@ -32,22 +38,21 @@ export class ModalLogin {
     private loginService: LoginService,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
-    private modalCtrl: ModalController,
-    private app: App
+    private modalCtrl: ModalController
   ) {
     this.userModel = new UserModel();
   }
 
   login() {
     let u = this.userModel;
-    let loadingLoggin = this.createLoading("Ingresando...");
+    let loadingLoggin = this.createLoading('Ingresando...');
     loadingLoggin.present();
     debugger;
-    this.loginService.login(u).then(user => {
+    this.loginService.login(u).then((user) => {
       this.hideLoading(loadingLoggin);
       debugger;
       if (user.logged) {
-        this.errorLogin = "";
+        this.errorLogin = '';
         this.dismiss(user);
       } else {
         if (!user.logged) {
@@ -59,18 +64,18 @@ export class ModalLogin {
 
   toggleLoginRegistration() {
     this.formLogin = !this.formLogin;
-    this.errorRegister = "";
-    this.errorLogin = "";
+    this.errorRegister = '';
+    this.errorLogin = '';
   }
 
   register() {
     let u = this.userModel;
-    let loadingRegister = this.createLoading("Registrando...");
+    let loadingRegister = this.createLoading('Registrando...');
     loadingRegister.present();
-    this.loginService.register(u).then(user => {
+    this.loginService.register(u).then((user) => {
       this.hideLoading(loadingRegister);
       if (user.registered) {
-        this.errorRegister = "";
+        this.errorRegister = '';
         this.dismiss(user);
       } else {
         if (!user.registered) {
@@ -80,42 +85,48 @@ export class ModalLogin {
     });
   }
 
-
   formValid() {
-    return (this.formComplete() && this.samePassword());
+    return this.formComplete() && this.samePassword();
   }
 
   formComplete() {
-    return (this.userModel.email && this.userModel.password
-      && this.userModel.passwordConfirmation);
+    return (
+      this.userModel.email &&
+      this.userModel.password &&
+      this.userModel.passwordConfirmation
+    );
   }
 
   samePassword() {
-    return ((this.userModel.password == this.userModel.passwordConfirmation) &&
-      (this.userModel.password != "" && this.userModel.password != null &&
-        this.userModel.password != undefined));
+    return (
+      this.userModel.password == this.userModel.passwordConfirmation &&
+      this.userModel.password != '' &&
+      this.userModel.password != null &&
+      this.userModel.password != undefined
+    );
   }
 
   distinctPassword() {
-    return ((this.userModel.password != this.userModel.passwordConfirmation) &&
-      (this.userModel.password != "" && this.userModel.password != null &&
-        this.userModel.password != undefined));
+    return (
+      this.userModel.password != this.userModel.passwordConfirmation &&
+      this.userModel.password != '' &&
+      this.userModel.password != null &&
+      this.userModel.password != undefined
+    );
   }
 
   alertText(aTitle, aSubTitle) {
     let alert = this.alertCtrl.create({
       title: aTitle,
       subTitle: aSubTitle,
-      buttons: ['Cerrar']
+      buttons: ['Cerrar'],
     });
     alert.present();
   }
 
-
   dismiss(user) {
     this.viewCtrl.dismiss(user);
   }
-
 
   private hideLoading(loading) {
     if (typeof loading != undefined && typeof loading != null) {
@@ -126,7 +137,7 @@ export class ModalLogin {
 
   private createLoading(msg) {
     return this.loadingCtrl.create({
-      content: msg
+      content: msg,
     });
   }
 
@@ -140,13 +151,15 @@ export class ModalLogin {
   }
 
   public initializeBackButtonCustomHandler(): void {
-    this.unregisterBackButtonAction = this.platform.registerBackButtonAction(() => {
-      this.customHandleBackButton();
-    }, 10);
+    this.unregisterBackButtonAction = this.platform.registerBackButtonAction(
+      () => {
+        this.customHandleBackButton();
+      },
+      10
+    );
   }
 
   private customHandleBackButton(): void {
-
     /*const nav = this.app.getActiveNavs()[0];
     const active = nav.getActive();
 
@@ -162,7 +175,7 @@ export class ModalLogin {
       this.dismissing = true;
     } else if (((Date.now() - this.lastBack) < closeDelay) &&
       (Date.now() - this.lastBack) > spamDelay) {
-      // Leaves app if user pressed button not faster than 500ms a time, 
+      // Leaves app if user pressed button not faster than 500ms a time,
       // and not slower than 2000ms a time.
       this.platform.exitApp();
     } else {
@@ -193,9 +206,9 @@ export class ModalLogin {
       this.allowClose = true;
       let toast = this.toastCtrl.create({
         //message: this.translate.instant("general.close_toast"),
-        message: "Doble toque para salir",
+        message: 'Doble toque para salir',
         duration: closeDelay,
-        dismissOnPageChange: true
+        dismissOnPageChange: true,
       });
       toast.onDidDismiss(() => {
         this.allowClose = false;
@@ -203,7 +216,7 @@ export class ModalLogin {
       toast.present();
     } else if (Date.now() - this.lastBack < closeDelay && this.allowClose) {
       let modalExitApp = this.modalCtrl.create(ModalExitApp);
-      modalExitApp.onDidDismiss(response => {
+      modalExitApp.onDidDismiss((response) => {
         if (response) {
           this.platform.exitApp();
         }
@@ -211,7 +224,5 @@ export class ModalLogin {
       modalExitApp.present();
     }
     this.lastBack = Date.now();
-
   }
-
 }

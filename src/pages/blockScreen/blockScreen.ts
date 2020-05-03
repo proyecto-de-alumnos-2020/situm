@@ -1,5 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
-import { Platform, ViewController, Events, ToastController } from 'ionic-angular';
+import {
+  Platform,
+  ViewController,
+  Events,
+  ToastController,
+} from 'ionic-angular';
 
 @Component({
   selector: 'page-blockScreen',
@@ -10,22 +15,18 @@ export class BlockScreenPage {
 
   public unregisterBackButtonAction: any;
   private allowClose = false;
-  private dismissing = true;
-  private spamming = true;
+
   private lastBack: number;
-  private codigo = "";
+  private codigo = '';
   constructor(
     public platform: Platform,
     public viewCtrl: ViewController,
     public events: Events,
     private toastCtrl: ToastController
-  ) {
-
-  }
-
+  ) {}
 
   desbloquear() {
-    if (this.codigo == "c2Pdtm19") {
+    if (this.codigo == 'c2Pdtm19') {
       this.dismiss();
     }
   }
@@ -33,7 +34,6 @@ export class BlockScreenPage {
   dismiss() {
     this.viewCtrl.dismiss();
   }
-
 
   ionViewDidEnter() {
     setTimeout(() => {
@@ -48,13 +48,15 @@ export class BlockScreenPage {
   }
 
   public initializeBackButtonCustomHandler(): void {
-    this.unregisterBackButtonAction = this.platform.registerBackButtonAction(() => {
-      this.customHandleBackButton();
-    }, 10);
+    this.unregisterBackButtonAction = this.platform.registerBackButtonAction(
+      () => {
+        this.customHandleBackButton();
+      },
+      10
+    );
   }
 
   private customHandleBackButton(): void {
-
     const closeDelay = 2000;
     const spamDelay = 500;
     debugger;
@@ -65,9 +67,9 @@ export class BlockScreenPage {
       this.allowClose = true;
       let toast = this.toastCtrl.create({
         //message: this.translate.instant("general.close_toast"),
-        message: "Doble toque para salir",
+        message: 'Doble toque para salir',
         duration: closeDelay,
-        dismissOnPageChange: true
+        dismissOnPageChange: true,
       });
       toast.onDidDismiss(() => {
         this.allowClose = false;
@@ -78,5 +80,4 @@ export class BlockScreenPage {
     }
     this.lastBack = Date.now();
   }
-
-} 
+}
