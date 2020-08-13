@@ -1,5 +1,6 @@
 import {
   GoogleMaps,
+  GoogleMapsEvent,
   GoogleMap,
   GoogleMapOptions,
   GroundOverlayOptions,
@@ -82,10 +83,13 @@ export class MapService {
       position: aLatLng,
       title: aTitleMarker,
     };
+
     return new Promise<Marker>((resPromesa) => {
-      aMap.addMarker(markerOptions).then((marker: Marker) => {
-        resPromesa(marker);
+      aMap.addMarker(markerOptions).then((marker: Marker) => {        
+        resPromesa(marker);        
       });
     });
   }
+
+
 }

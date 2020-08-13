@@ -3,7 +3,7 @@
     <name>AuthoringTool</name>
     <description />
     <author email="support@situm.es" href="http://www.situm.es">Situm Technologies</author>
-    <content src="index.html" />
+    <content original-src="index.html" src="http://localhost:8100" />
     <access origin="*" />
     <allow-navigation href="*" />
     <allow-intent href="http://*/*" />
@@ -111,4 +111,5 @@
     <plugin name="cordova-plugin-file-transfer" spec="^1.7.1" />
     <plugin name="cordova-plugin-file" spec="^6.0.1" />
     <plugin name="cordova-plugin-network-information" spec="^2.0.1" />
+    <allow-navigation href="http://localhost:8100" sessionid="d6585470" />
 </widget>
