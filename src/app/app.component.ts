@@ -15,6 +15,7 @@ import { Subscription } from 'rxjs';
 import { Network } from '@ionic-native/network';
 import { Diagnostic } from '@ionic-native/diagnostic'; //GPS ENCENDIDO
 import { BlockScreenPage } from '../pages/blockScreen/blockScreen';
+import { Situm, Fixed } from '../services/positioning.service';
 declare var cordova: any;
 
 @Component({
@@ -208,14 +209,28 @@ export class MyApp {
     }
   }
 
+  public getPositioning(aStringPositioningClass) {
+    //DEBERÍA SER POR REFLECTION
+    switch (aStringPositioningClass) {
+      case 'Situm': {
+        return new Situm();
+      }
+      case 'Fixed': {
+        return new Fixed();
+      }
+    }
+  }
+
 
   prepareWorkspacesStatusesAndKind(aWorkspaces) {
     aWorkspaces.forEach(ws => {
       debugger;
       let statusClassString = ws.status.idStatus;
       let kindClassString = ws.kind.idKind;
+      let positioningClassString = ws.positioning.idPositioning;
       ws.status = this.getCurrentStatus(statusClassString);
       ws.kind = this.getKind(kindClassString);
+      ws.positioning = this.getPositioning(positioningClassString);
       //import { WorkspaceService, Workspace, StatusWorkspace, RestrictedEdition, UnrestrictedEdition, Published } from '../services/workspace.service';
       /*const dynModule = require('./' + _.snakeCase(classTypeString));
       const klass = dynModule[classTypeString];

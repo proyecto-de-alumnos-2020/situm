@@ -48,7 +48,20 @@
         </ion-option>
       </ion-select>
     </ion-item>
-
+    <ion-item style="padding-left:0px;">
+      <ion-label style="color: black">Posicionamiento:</ion-label>
+      <ion-select style="max-width: 100%;" class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" [(ngModel)]="positioning">
+        <ion-option disabled selected value="undefined">
+          <ion-label>Seleccionar</ion-label>
+        </ion-option>
+        <ion-option value="Situm">
+          <ion-label>Situm</ion-label>
+        </ion-option>
+        <ion-option value="Fixed">
+          <ion-label>Fijo</ion-label>
+        </ion-option>
+      </ion-select>
+    </ion-item>
 
     <div style="text-align: center">
       <button ion-button color="danger" (click)="cancelAddWorkspace()">Cancelar</button>

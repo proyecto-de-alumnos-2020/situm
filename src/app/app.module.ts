@@ -36,7 +36,6 @@ import { NuevoPoiPage } from '../pages/nuevoPoi/nuevoPoi';
 import { MapService } from '../services/map.service';
 import { LoginService } from '../services/login.service';
 import { WorkspaceService } from '../services/workspace.service';
-import { PositioningService } from '../services/positioning.service';
 import { Network } from '@ionic-native/network';
 
 //Imports de Camara
@@ -110,7 +109,6 @@ import { firebaseConfig } from '../firebaseConfig';
     LoginService,
     MapService,
     WorkspaceService,
-    PositioningService,
     Camera,
     PositioningPage,
     BarcodeScanner, //PARA ENCODE SIN MOSTRAR

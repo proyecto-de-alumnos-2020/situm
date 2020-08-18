@@ -12,6 +12,11 @@ import {
   RecorridoLineal,
   CrearLugaresRelevantes,
 } from '../../services/workspace.service';
+
+import {
+  Situm,
+  Fixed,
+} from '../../services/positioning.service'
 @Component({
   selector: 'page-newWorkspace',
   templateUrl: 'modalNewWorkspace.html',
@@ -22,6 +27,7 @@ export class ModalNewWorkspace {
   public coloursList;
   public edificaciones;
   public kindOfWorkspace: any;
+  public positioning: any;
 
   newWorkspace: Workspace;
   constructor(
@@ -61,6 +67,7 @@ export class ModalNewWorkspace {
     debugger;
     this.kindOfWorkspace = 'CrearLugaresRelevantes';
     this.newWorkspace.kind = this.getKind(this.kindOfWorkspace);
+    this.newWorkspace.positioning = this.getPositioning(this.positioning);
     this.viewCtrl.dismiss(this.newWorkspace);
   }
 
@@ -72,6 +79,18 @@ export class ModalNewWorkspace {
       }
       case 'RecorridoLineal': {
         return new RecorridoLineal();
+      }
+    }
+  }
+
+  public getPositioning(aStringPositioningClass) {
+    //DEBERÍA SER POR REFLECTION
+    switch (aStringPositioningClass) {
+      case 'Situm': {
+        return new Situm();
+      }
+      case 'Fixed': {
+        return new Fixed();
       }
     }
   }
@@ -99,11 +118,16 @@ export class ModalNewWorkspace {
     return this.kindOfWorkspace != '' && this.kindOfWorkspace != undefined;
   }
 
+  public positioningSelected() {
+    return this.positioning != '' && this.positioning != undefined;
+  }
+
   public isComplete() {
     return (
       this.isValidName() &&
       this.buildingSelected() &&
-      this.kindOfWorkspaceSelected()
+      this.kindOfWorkspaceSelected() &&
+      this.positioningSelected()
     );
   }
 

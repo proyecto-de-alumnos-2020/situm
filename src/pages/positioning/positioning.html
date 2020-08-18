@@ -171,6 +171,19 @@
               </ion-option>
             </ion-select>
           </ion-item>
+          <!--<ion-item *ngIf="isCurrentWorkspaceOwner" text-wrap style="border-bottom: 1px solid #dedede; min-width: 69vw;"
+            class="fondoBlanco">
+            <ion-label style="color: black">
+              <b>Posicionamiento:</b>
+            </ion-label>
+            <ion-select class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" [(ngModel)]="currentWorkspace.positioning.idPositioning"
+              (ionChange)="changeWorkspacePositioning($event, fab)">
+              <ion-option text-wrap *ngFor="let pos of possiblesPositioningStrings" value="{{pos}}">
+                <div *ngIf='pos == "Situm"'>Situm</div>
+                <div *ngIf='pos == "Fixed"'>Fijo</div>
+              </ion-option>
+            </ion-select>
+          </ion-item> -->
           <button style="border-bottom: 1px solid #dedede;" *ngIf="isCurrentWorkspaceOwner" ion-item (click)="closeFab(fab);shareViaQR()">
             <ion-icon color="dark" ios="ios-barcode" md="md-barcode" item-start></ion-icon>
             Compartir workspace via QR

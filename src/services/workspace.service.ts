@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Building, BuildingsService } from '../services/buildings.service';
+import { SensingMechanism } from '../services/positioning.service';
 import { Subscription } from 'rxjs';
 
 export interface WorkspaceStatus {
@@ -156,8 +157,9 @@ export class Workspace {
     building: Building;
     status: WorkspaceStatus;
     kind: Kind;
+    positioning: SensingMechanism;
     strategyToShowPoIWLAN?: StrategyToShowMarker;
-    strategyToShowPoIQR?: StrategyToShowMarker
+    strategyToShowPoIQR?: StrategyToShowMarker;
     strategyToShowInformationPoIWLAN?: StrategyToShowInformation;
     strategyToShowInformationPoIQR?: StrategyToShowInformation;
 }
@@ -171,6 +173,7 @@ export class WorkspaceReference {
         this.idWorkspace = anIdWorkspace;
         this.idColour = anIdColour;
     }
+    
 }
 
 
@@ -238,7 +241,17 @@ export class WorkspaceService {
     constructor(public angularfirebaseDB: AngularFireDatabase,
         private buildingService: BuildingsService) { }
 
+    public deleteWorkspaces(workspace) {
+        return new Promise<boolean>((result) => {
+            this.angularfirebaseDB.database.ref('workspaces/' +
+            workspace.idOwner).set(null).then(resolve => {
+                    result(true);
+                }, reject => {
+                    result(false);
+                })
+        });
 
+    }
 
     public getWorkspaceFromReference(workspaceReference) {
         return new Promise<Workspace>((result) => {
@@ -389,6 +402,21 @@ export class WorkspaceService {
         });
     }
 
+    /*public updateWorkspacePositioning(aWorkspace, newPos) {
+        return new Promise<boolean>((resPromesa) => {
+            debugger;
+            aWorkspace.building = null;
+            this.angularfirebaseDB.database.ref(this.tabla + '/' + aWorkspace.idOwner + '/' + aWorkspace.idWorkspace + '/positioning/').set(newPos).then(
+                resolve => {
+                    debugger;
+                    resPromesa(true);
+                }, reject => {
+                    debugger;
+                    resPromesa(false);
+                });
+        });
+    }*/
+
     public defineWorkspaceStrategiesAndUpdateState(aWorkspace, VersionFinalPublica, strategies) {
         debugger;
         let editedWorkspace = new Workspace(); //CREO UN WORKSPACE NUEVO 
@@ -401,6 +429,7 @@ export class WorkspaceService {
         editedWorkspace.kind = aWorkspace.kind;
         editedWorkspace.name = aWorkspace.name;
         editedWorkspace.status = aWorkspace.status;
+        editedWorkspace.positioning = aWorkspace.positioning;
         editedWorkspace.strategyToShowPoIWLAN = strategies.estrategiaSeleccionadaParaMostrarPOIWLAN; //AGREGO ESTRATEGIA PARA MOSTRAR POI SIN QR
         editedWorkspace.strategyToShowPoIQR = strategies.estrategiaSeleccionadaParaMostrarPOIQR;  //AGREGO ESTRATEGIA PARA MOSTRAR POI CON QR
         editedWorkspace.strategyToShowInformationPoIWLAN = strategies.estrategiaSeleccionadaParaMostrarInformacionPOIWLAN; //AGREGO ESTRATEGIA PARA MOSTRAR INFORMACION DEL POI SIN QR
