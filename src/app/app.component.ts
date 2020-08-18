@@ -122,39 +122,15 @@ export class MyApp {
 
       /*INICIO DE LLAMADOS A FIREBASE*/
       this.loggedUser = aUserLogged; //MANDO LOS DATOS DEL USUARIO LOGUEADO A LA APP PRINCIPAL PARA QUE TENGA ACCESO EL MENU PRINCIPAL
-      let message;
       this.workspaceService.getWorkspaces(this.loggedUser.uid).then(ownWorkspacesResult => {
-        if (ownWorkspacesResult) {
-          console.log("WORKSPACES PROPIOS TRAIDOS");
-          console.log(ownWorkspacesResult);
-          this.loadedResources = this.loadedResources + 1;
-          this.hideLoadingResources();
-          debugger;
-          this.setWorkspaces(ownWorkspacesResult);
-        } else {
-          message = "Hubo un error al obtener los workspaces, intente nuevamente.";
-          this.presentToast(message, 'top', null);
-        }
+        this.initializeWorskpaces(ownWorkspacesResult);
       });
 
       this.workspaceService.getWorkspacesReferences(this.loggedUser.uid).then(references => {
-        debugger;
-        console.log("QUE TENIAN LAS REFERENCIAS?");
-        console.log(references);
-        console.log("EL USER TENIA:");
-        console.log(this.loggedUser);
-        if (references.length != 0) {
-          debugger;
-          this.getWorkspacesFromReferences(references);
-        } else {
-          this.loadedResources = this.loadedResources + 1; //SI NO TIENE REFERENCIAS TENGO QUE ASUMIR QUE YA SE CARGÓ
-          this.hideLoadingResources();
-        }
+        this.initializeReferences(references);
       });
       /*FIN DE LLAMADOS A FIREBASE*/
     });
-
-
 
     this.events.subscribe('addWorkspaceAsCollaborator', (wsReference) => {
       this.importWorkspaceFromAnotherUser2(wsReference);
@@ -170,6 +146,34 @@ export class MyApp {
     });
   }
 
+  initializeWorskpaces(ownWorkspacesResult){
+    if (ownWorkspacesResult) {
+      console.log("WORKSPACES PROPIOS TRAIDOS");
+      console.log(ownWorkspacesResult);
+      this.loadedResources = this.loadedResources + 1;
+      this.hideLoadingResources();
+      debugger;
+      this.setWorkspaces(ownWorkspacesResult);
+    } else {
+      let message = "Hubo un error al obtener los workspaces, intente nuevamente.";
+      this.presentToast(message, 'top', null);
+    }
+  }
+
+  initializeReferences(references){
+    debugger;
+        console.log("QUE TENIAN LAS REFERENCIAS?");
+        console.log(references);
+        console.log("EL USER TENIA:");
+        console.log(this.loggedUser);
+        if (references.length != 0) {
+          debugger;
+          this.getWorkspacesFromReferences(references);
+        } else {
+          this.loadedResources = this.loadedResources + 1; //SI NO TIENE REFERENCIAS TENGO QUE ASUMIR QUE YA SE CARGÓ
+          this.hideLoadingResources();
+        }
+  }
 
   hideLoadingResources() {
     //Edificios, Workspaces y Workspaces as collaborator (3 recursos en total)
@@ -270,10 +274,7 @@ export class MyApp {
 
         if (ws.status.idStatus == "VersionFinalPublica") {
           if (!collaboratorFound) {//SI NO ESTABA EN LA COLECCION
-            collaboratorData.idCollaborator = this.loggedUser.uid;
-            collaboratorData.idColour = userColour;
-            collaboratorData.isFinalUser = true;
-            collaboratorData.isCollaborator = false;
+            collaboratorData = this.newCollaborator(this.loggedUser.uid, userColour, false, true);
             loadingUniendose = this.createLoading("Uniéndose...");
             loadingUniendose.present();
             this.workspaceService.addMeAsFinalUser(workspaceReference, collaboratorData).then(response => {
@@ -290,10 +291,7 @@ export class MyApp {
             });
           } else { //ESTABA EN LA COLECCION, LO ENCONRO
             if (!collaboratorFound.isFinalUser) { //SI NO ES USUARIO FINAL
-              collaboratorData.idCollaborator = collaboratorFound.idCollaborator;
-              collaboratorData.idColour = collaboratorFound.idColour;
-              collaboratorData.isCollaborator = collaboratorFound.isCollaborator;
-              collaboratorData.isFinalUser = true;
+              collaboratorData = this.foundCollaborator(collaboratorFound, "Final");
               loadingUniendose = this.createLoading("Uniéndose...");
               loadingUniendose.present();
               this.workspaceService.updateFinalUserOrCollaborator(workspaceReference, collaboratorData).then(response => {
@@ -314,10 +312,7 @@ export class MyApp {
           }
         } else { //SI NO ESTA EN ESTADO VERSION FINAL PUBLICO
           if (!collaboratorFound) {//SI NO ESTABA EN LA COLECCION
-            collaboratorData.idCollaborator = this.loggedUser.uid;
-            collaboratorData.idColour = userColour;
-            collaboratorData.isFinalUser = false;
-            collaboratorData.isCollaborator = true;
+            collaboratorData = this.newCollaborator(this.loggedUser.uid, userColour, true, false);
             loadingUniendose = this.createLoading("Uniéndose...");
             loadingUniendose.present();
             this.workspaceService.addMeAsCollaborator(workspaceReference, collaboratorData).then(result => {
@@ -333,10 +328,7 @@ export class MyApp {
             });
           } else {//SI ESTABA EN LA COLECCION
             if (!collaboratorFound.isCollaborator) {//SI NO ERA COLABORADOR
-              collaboratorData.idCollaborator = collaboratorFound.idCollaborator;
-              collaboratorData.idColour = collaboratorFound.idColour;
-              collaboratorData.isFinalUser = collaboratorFound.isFinalUser;
-              collaboratorData.isCollaborator = true;
+              collaboratorData = this.foundCollaborator(collaboratorFound, "Collaborator");
               loadingUniendose = this.createLoading("Uniéndose...");
               loadingUniendose.present();
               this.workspaceService.updateFinalUserOrCollaborator(workspaceReference, collaboratorData).then(response => {
@@ -361,6 +353,24 @@ export class MyApp {
     } else {
       this.alertText("AVISO", "Ud. Es el creador y no puede unirse a un workspace propio como colaborador o usuario final.");
     }
+  }
+
+  foundCollaborator(colFound, type){
+    let cData;
+    switch (type){
+      case "Final": {
+        cData = { idCollaborator: colFound.idCollaborator, idColour: colFound.idColour, isFinalUser: true, isCollaborator: colFound.isCollaborator };
+      }
+      case "Collaborator": {
+        cData = { idCollaborator: colFound.idCollaborator, idColour: colFound.idColour, isFinalUser: colFound.isFinalUser, isCollaborator: true };
+      }
+    }
+    return cData
+  }
+
+  newCollaborator(idCollaborator: string, idColour: string, isFinalUser: boolean, isCollaborator: boolean){
+    let cData = { idCollaborator, idColour, isFinalUser, isCollaborator };
+    return cData
   }
 
   importWorkspaceFromAnotherUser(workspaceReference) {
