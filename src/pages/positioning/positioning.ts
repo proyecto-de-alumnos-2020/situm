@@ -2949,13 +2949,13 @@ export class PositioningPage {
   // * Probando cambiar color de marker
   turnMarkerGreen(poi:Poi){
     poi.colour = '#66BB6A';
-    this.poisService.savePoi(this.currentWorkspace.idWorkspace,poi).then((res)=>{alert(res)});
+    this.poisService.savePoi(this.currentWorkspace.idWorkspace,poi).then((res)=>{});
   }
   
   guardarPosicion(marker:Marker,poi:Poi){
     poi.coordinate.latitude = marker.getPosition().lat.toString();
     poi.coordinate.longitude = marker.getPosition().lng.toString();
-    this.poisService.savePoi(this.currentWorkspace.idWorkspace,poi).then((res)=>{alert(res)});
+    this.poisService.savePoi(this.currentWorkspace.idWorkspace,poi).then((res)=>{});
   }
   ///
 }
