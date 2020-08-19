@@ -226,6 +226,11 @@ export class PositioningPage {
     private file: File,
     private cam: Camera
   ) {
+    //CAMBIO DE COLOR
+    this.modelQRPoi = 'Hola';
+    this.isFinalMode = false;
+    this.changeableColour = '#1576C9';
+    //CAMBIO DE COLOR
     events.subscribe('functionCall:guardarPosicionActual', () => {
       this.saveCurrentPosition();
     });
