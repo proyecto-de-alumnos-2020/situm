@@ -1759,6 +1759,7 @@ export class PositioningPage {
               .then((marker) => {
                 //marker es el resultado de la promesa
                 //this.currentMarkers.push(marker);
+                
                 marcadoresDibujados = marcadoresDibujados + 1;
                 marker.on(GoogleMapsEvent.INFO_CLICK).subscribe(() => {
                   this.verDatosPoi(poi);
@@ -1793,6 +1794,11 @@ export class PositioningPage {
               //marker es el resultado de la promesa
               //this.currentMarkers.push(marker);
               marcadoresDibujados = marcadoresDibujados + 1;
+              //marker.setIconAnchor(25,-75);
+              marker.setDraggable(true);
+              marker.on(GoogleMapsEvent.MARKER_DRAG_END).subscribe(()=>{this.guardarPosicion(marker,poi)})
+              marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(()=>
+          {this.turnMarkerGreen(poi)});
               marker.on(GoogleMapsEvent.INFO_CLICK).subscribe(() => {
                 this.verDatosPoi(poi);
                 // if(!poi.hasQRCode){/*SE DELEGA A DISTINTO TIPO DE ESTRATEGIA, POR ESO SE PREGUNTA SI TIENE O NO QR*/
@@ -2793,4 +2799,18 @@ export class PositioningPage {
     if (this.routeConditionsNotSet() || !this.route) return true;
     return false;
   }
+
+
+  // * Probando cambiar color de marker
+  turnMarkerGreen(poi:Poi){
+    poi.colour = '#66BB6A';
+    this.poisService.savePoi(this.currentWorkspace.idWorkspace,poi).then((res)=>{});
+  }
+  
+  guardarPosicion(marker:Marker,poi:Poi){
+    poi.coordinate.latitude = marker.getPosition().lat.toString();
+    poi.coordinate.longitude = marker.getPosition().lng.toString();
+    this.poisService.savePoi(this.currentWorkspace.idWorkspace,poi).then((res)=>{});
+  }
+  ///
 }
