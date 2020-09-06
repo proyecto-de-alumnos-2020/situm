@@ -1,14 +1,20 @@
 import {
   GoogleMaps,
   GoogleMap,
+  GoogleMapsEvent,
   GoogleMapOptions,
+  LatLng,
+  ILatLng,
   GroundOverlayOptions,
   MarkerOptions,
   MarkerIcon,
   Marker,
-  GroundOverlay,
-} from '@ionic-native/google-maps';
-import { Injectable } from '@angular/core';
+  PolylineOptions,
+  Polyline,
+  GroundOverlay
+} from "@ionic-native/google-maps";
+import { Injectable, ApplicationRef } from "@angular/core";
+import { a } from "@angular/core/src/render3";
 
 @Injectable()
 export class MapService {
@@ -19,19 +25,19 @@ export class MapService {
     let options: GoogleMapOptions = {
       camera: {
         target: aLatLng,
-        zoom: aZoom,
-      },
+        zoom: aZoom
+      }
     };
     this.map = GoogleMaps.create(aDomElement, options);
     return this.map;
   }
 
   public addGroundOverlay(aMap, anUrlImage, aBounds, aRotation) {
-    return new Promise<GroundOverlay>((resPromesa) => {
+    return new Promise<GroundOverlay>(resPromesa => {
       let groundOptions: GroundOverlayOptions = {
         url: anUrlImage,
         bounds: aBounds,
-        bearing: (aRotation * 180) / Math.PI,
+        bearing: (aRotation * 180) / Math.PI
       };
       aMap
         .addGroundOverlay(groundOptions)
@@ -42,10 +48,10 @@ export class MapService {
   }
 
   public rePositioning(aMap, aLatLng, aZoom) {
-    return new Promise<GoogleMap>((resPromesa) => {
+    return new Promise<GoogleMap>(resPromesa => {
       aMap.moveCamera({
         target: aLatLng,
-        zoom: aZoom,
+        zoom: aZoom
       });
       resPromesa(aMap);
     });
@@ -59,14 +65,17 @@ export class MapService {
     aSize,
     hasQRCode
   ) {
-    let aSnippet = 'Click aquí para abrir';
+    let aSnippet = hasQRCode
+      ? "Posiciónate, busca el código QR, y léelo para recibir la pregunta."
+      : "Click aquí para abrir";
+
     let markerIcon: MarkerIcon = { size: { height: aSize, width: aSize } };
     let colourWithoutHash = hexColour.substring(1); //QUITO EL HASH
     debugger;
     if (hasQRCode) {
-      markerIcon.url = 'assets/img/pinPoiQR' + colourWithoutHash + '.png';
+      markerIcon.url = "assets/img/pinPoiQR" + colourWithoutHash + ".png";
     } else {
-      markerIcon.url = 'assets/img/pinPoi' + colourWithoutHash + '.png';
+      markerIcon.url = "assets/img/pinPoi" + colourWithoutHash + ".png";
     }
     //markerIcon.url = "assets/img/pinPoiE040FB.png"
     /*let icon = { //CUANDO SE HABILITE LA OPCION DE SVG EN IONIC
@@ -80,9 +89,9 @@ export class MapService {
       icon: markerIcon,
       snippet: aSnippet,
       position: aLatLng,
-      title: aTitleMarker,
+      title: aTitleMarker
     };
-    return new Promise<Marker>((resPromesa) => {
+    return new Promise<Marker>(resPromesa => {
       aMap.addMarker(markerOptions).then((marker: Marker) => {
         resPromesa(marker);
       });

@@ -1,8 +1,16 @@
-page-modal{
-    .item-md {
-        padding-left: 0px;
-    }
-    .card-md .item-md.item-block .item-inner {
-        margin-left: 0px;
-    }
+page-modal {
+  .item-md {
+    padding-left: 0px;
+  }
+  .card-md .item-md.item-block .item-inner {
+    margin-left: 0px;
+  }
+}
+
+.question {
+  padding: 20px 0px 0px;
+  text-align: center;
+  font-size: 19px !important;
+  border-top: 1px solid #e2e2e2;
+  margin: 15px !important;
 }

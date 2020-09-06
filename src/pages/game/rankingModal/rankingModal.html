@@ -1,0 +1,57 @@
+<ion-card scrollY="true" style="margin-top: 36vh; width:90%; margin-left:3vh;">
+  <ion-card-title style="text-align: center"
+    >Ranking de Jugadores</ion-card-title
+  >
+
+  <ion-card-content>
+    <!-- No Results -->
+    <div
+      style="padding-left:0px; margin-top: -10px; text-align: center;"
+      *ngIf="scores && !scores.length"
+    >
+      <img
+        src="assets/img/ranking.png"
+        style="
+        max-width: 15vh;
+        margin: 10px auto;
+        margin-bottom: 15px;
+        "
+      />
+
+      <p>Todavia no se registró nungún resultado</p>
+    </div>
+
+    <!-- Results table -->
+    <ion-scroll
+      scrollY="true"
+      style="min-height: 40vh;"
+      *ngIf="scores && scores.length"
+    >
+      <ion-list
+        style="padding-left:0px; margin-top: -10px; text-align: center;"
+      >
+        <ion-item *ngFor="let score of scores; let i = index">
+          <ion-avatar item-start>
+            <img [src]="getImgSrc(i)" style="border-radius: none!important" />
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ score.user.email }}</h2>
+            <h3>{{ score.score }} puntos</h3>
+            <p>{{ score.time }} segundos</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-scroll>
+
+    <div style="text-align: center">
+      <button
+        style="min-width: 65px; margin-top: 15px;"
+        ion-button
+        color="myBlueColour"
+        (click)="close()"
+      >
+        Cerrar
+      </button>
+    </div>
+  </ion-card-content>
+</ion-card>

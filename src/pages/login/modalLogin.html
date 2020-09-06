@@ -1,4 +1,4 @@
-<ion-card>
+<ion-card scrollY="true">
   <ion-card-content>
     <div *ngIf="formLogin">
       <ion-card-title style="text-align: center">
@@ -15,7 +15,13 @@
         <ion-col col-12 style="position:initial !important;">
           <ion-item>
             <ion-label color="myBlueColour" stacked>Email:</ion-label>
-            <ion-input type="text" min=5 max=20 placeholder="usuario@dominio" [(ngModel)]="userModel.email"></ion-input>
+            <ion-input
+              type="text"
+              min="5"
+              max="20"
+              placeholder="usuario@dominio"
+              [(ngModel)]="userModel.email"
+            ></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -23,42 +29,112 @@
         <ion-col col-12 style="position:initial !important;">
           <ion-item>
             <ion-label color="myBlueColour" stacked>Password:</ion-label>
-            <ion-input type="password" min=5 max=20 placeholder="*******" [(ngModel)]="userModel.password"></ion-input>
+            <ion-input
+              type="password"
+              min="5"
+              max="20"
+              placeholder="*******"
+              [(ngModel)]="userModel.password"
+            ></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
       <ion-row *ngIf="formLogin">
         <ion-col col-12 style="position:initial !important;">
-          <ion-label *ngIf="errorLogin != ''" color="danger" staked style="text-align: right">{{errorLogin}}</ion-label>
+          <ion-label
+            *ngIf="errorLogin != ''"
+            color="danger"
+            staked
+            style="text-align: right"
+            >{{ errorLogin }}</ion-label
+          >
           <div style="text-align: center">
-            <button ion-button color="myBlueColour" [disabled]="!userModel.email || !userModel.password" (click)="login()">Ingresar!</button>
+            <button
+              ion-button
+              color="myBlueColour"
+              [disabled]="!userModel.email || !userModel.password"
+              (click)="login()"
+            >
+              Ingresar!
+            </button>
           </div>
           <div style="text-align: right; margin-right:1%">
-            <button color="danger" outline ion-button small (click)="toggleLoginRegistration()">NO TENGO CUENTA</button>
+            <button
+              color="danger"
+              outline
+              ion-button
+              small
+              (click)="toggleLoginRegistration()"
+            >
+              NO TENGO CUENTA
+            </button>
           </div>
         </ion-col>
       </ion-row>
       <ion-row *ngIf="!formLogin">
         <ion-col col-12 style="position:initial !important;">
           <ion-item>
-            <ion-label color="myBlueColour" stacked>Confirme Password:</ion-label>
-            <ion-input type="password" min=5 max=20 placeholder="******" [(ngModel)]="userModel.passwordConfirmation"></ion-input>
+            <ion-label color="myBlueColour" stacked
+              >Confirme Password:</ion-label
+            >
+            <ion-input
+              type="password"
+              min="5"
+              max="20"
+              placeholder="******"
+              [(ngModel)]="userModel.passwordConfirmation"
+            ></ion-input>
           </ion-item>
-          <ion-label *ngIf="samePassword()" color="secondary" staked style="text-align: right">Las contraseñas coinciden</ion-label>
-          <ion-label *ngIf="distinctPassword()" color="danger" staked style="text-align: right">Las contraseñas no coinciden</ion-label>
-          <ion-label *ngIf="errorRegister != ''" color="danger" staked style="text-align: right">{{errorRegister}}</ion-label>
-          <ion-label color="danger" staked style="text-align: right">{{errorLogin}}</ion-label>
+          <ion-label
+            *ngIf="samePassword()"
+            color="secondary"
+            staked
+            style="text-align: right"
+            >Las contraseñas coinciden</ion-label
+          >
+          <ion-label
+            *ngIf="distinctPassword()"
+            color="danger"
+            staked
+            style="text-align: right"
+            >Las contraseñas no coinciden</ion-label
+          >
+          <ion-label
+            *ngIf="errorRegister != ''"
+            color="danger"
+            staked
+            style="text-align: right"
+            >{{ errorRegister }}</ion-label
+          >
+          <ion-label color="danger" staked style="text-align: right">{{
+            errorLogin
+          }}</ion-label>
         </ion-col>
       </ion-row>
       <ion-row *ngIf="!formLogin">
         <ion-col col-12 style="position:initial !important;">
           <div style="text-align: center">
-            <button ion-button color="myBlueColour" [disabled]="!formValid()" (click)="register()">Registrarme!</button>
+            <button
+              ion-button
+              color="myBlueColour"
+              [disabled]="!formValid()"
+              (click)="register()"
+            >
+              Registrarme!
+            </button>
           </div>
         </ion-col>
         <ion-col col-12 style="position:initial !important;">
           <div style="text-align: right; margin-right:1%">
-            <button color="danger" outline ion-button small (click)="toggleLoginRegistration()">YA TENGO CUENTA</button>
+            <button
+              color="danger"
+              outline
+              ion-button
+              small
+              (click)="toggleLoginRegistration()"
+            >
+              YA TENGO CUENTA
+            </button>
           </div>
         </ion-col>
       </ion-row>

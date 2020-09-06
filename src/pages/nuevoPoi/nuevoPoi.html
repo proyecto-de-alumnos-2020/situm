@@ -1,52 +1,139 @@
 <ion-card>
   <ion-card-content>
-    <ion-row [hidden]="keyboard.isOpen()">
+    <ion-row [hidden]="keyword && keyword.isOpen()">
       <ion-col col-6 colSixNoPadding>
         <ion-item style="padding-left:0px">
           <ion-thumbnail item-start style="margin:0; padding:0px;">
             <div *ngIf="nuevoPoi.infoHtml">
-              <img [src]="nuevoPoi.infoHtml" [(ngModel)]="nuevoPoi.infoHtml" ngDefaultControl style="width:100%; height: 100%;">
+              <img
+                [src]="nuevoPoi.infoHtml"
+                [(ngModel)]="nuevoPoi.infoHtml"
+                ngDefaultControl
+                style="width:100%; height: 100%;"
+              />
             </div>
-            <div *ngIf="!nuevoPoi.infoHtml" >
-              <img src="assets/img/loadImagePlease.png" style="width:100%; height: 100%;">
+            <div *ngIf="!nuevoPoi.infoHtml">
+              <img
+                src="assets/img/loadImagePlease.png"
+                style="width:100%; height: 100%;"
+              />
             </div>
           </ion-thumbnail>
         </ion-item>
       </ion-col>
       <ion-col col-6>
         <ion-item style="margin:0px; padding-left:0px">
-          <button ion-button block icon-start full color="myBlueColour" (click)="tomarFoto()" style="width: 100% !important; margin-top:0% !important;">
+          <button
+            ion-button
+            block
+            icon-start
+            full
+            color="myBlueColour"
+            (click)="tomarFoto()"
+            style="width: 100% !important; margin-top:0% !important;"
+          >
             <ion-icon ios="ios-camera" md="md-camera"></ion-icon>
             Tomar foto
           </button>
         </ion-item>
         <ion-item text-wrap style="margin-top:0px; padding-left:0px;">
-           <div style="color: red; font-size: 1.7 !important">
-              <span style="color:black!important; font-weight: bold !important">Nota:</span> Se recomienda en forma horizontal y todos los campos son requeridos.
-           </div>
+          <div style="color: red; font-size: 1.7 !important">
+            <span style="color:black!important; font-weight: bold !important"
+              >Nota:</span
+            >
+            Se recomienda en forma horizontal y todos los campos son requeridos.
+          </div>
         </ion-item>
       </ion-col>
     </ion-row>
     <ion-item style="padding-left:0px; padding-top: 2%">
       <ion-label color="myBlueColour" stacked>Nombre / Título:</ion-label>
-      <ion-input type="text" min=1 max=20 placeholder="Este es el título del PoI" [(ngModel)]="nuevoPoi.poiName">{{nuevoPoi.poiName}}</ion-input>
+      <ion-input
+        type="text"
+        min="1"
+        max="20"
+        placeholder="Este es el título del PoI"
+        [(ngModel)]="nuevoPoi.poiName"
+        >{{ nuevoPoi.poiName }}</ion-input
+      >
     </ion-item>
     <ion-item style="padding-left:0px;">
       <ion-label color="myBlueColour" stacked>Descripción:</ion-label>
-      <ion-textarea type="text" min=5 max=500 placeholder="Esta es una descripción del PoI" [(ngModel)]="nuevoPoi.category">{{nuevoPoi.category}}</ion-textarea>
+      <ion-textarea
+        type="text"
+        min="5"
+        max="500"
+        placeholder="Esta es una descripción del PoI"
+        [(ngModel)]="nuevoPoi.category"
+        >{{ nuevoPoi.category }}</ion-textarea
+      >
     </ion-item>
+
+    <ion-item style="padding-left:0px;" *ngIf="hasQuestions">
+      <ion-label color="myBlueColour" stacked>Pregunta:</ion-label>
+      <ion-textarea
+        type="text"
+        min="5"
+        max="500"
+        placeholder="Esta es una pregunta para el PoI"
+        [(ngModel)]="nuevoPoi.question"
+        >{{ nuevoPoi.question }}</ion-textarea
+      >
+    </ion-item>
+
+    <ion-list radio-group [(ngModel)]="nuevoPoi.answer" *ngIf="hasQuestions">
+      <ion-list-header
+        style="padding-left: 0px;
+      margin-bottom: 0px;
+      margin-top: -19px;
+      border-top: none;
+      color: #1576C9;
+      font-size: 12px;"
+      >
+        Respuesta:
+      </ion-list-header>
+
+      <ion-item>
+        <ion-label>Falso</ion-label>
+        <ion-radio value="false"></ion-radio>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Verdadero</ion-label>
+        <ion-radio value="true"></ion-radio>
+      </ion-item>
+    </ion-list>
+
     <ion-item style="padding-left:0px;">
       <ion-label style="color: black">Brindar el PoI:</ion-label>
-      <ion-select style="max-width: 100%;" (ionChange)="printElection($event)"
-        class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" [(ngModel)]="qrOptionSelected">
+      <ion-select
+        style="max-width: 100%;"
+        (ionChange)="printElection($event)"
+        class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante"
+        [(ngModel)]="qrOptionSelected"
+      >
         <ion-option *ngFor="let option of options" value="{{ option }}">
           {{ option }}
         </ion-option>
       </ion-select>
     </ion-item>
     <div style="text-align: center">
-      <button ion-button color="danger" (click)="dismissWithoutSave()">Cancelar</button>
-      <button ion-button color="myBlueColour" [disabled]="!nuevoPoi.infoHtml || !nuevoPoi.poiName || !nuevoPoi.category" (click)="acceptAddPoi()">Aceptar</button>
+      <button ion-button color="danger" (click)="dismissWithoutSave()">
+        Cancelar
+      </button>
+      <button
+        ion-button
+        color="myBlueColour"
+        [disabled]="
+          !nuevoPoi.infoHtml ||
+          !nuevoPoi.poiName ||
+          !nuevoPoi.category ||
+          !completeQuestion
+        "
+        (click)="acceptAddPoi()"
+      >
+        Aceptar
+      </button>
     </div>
   </ion-card-content>
 </ion-card>

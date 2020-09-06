@@ -1,47 +1,157 @@
-<ion-card>
-  <ion-card-title *ngIf="editionMode" style="text-align: center">Editando POI</ion-card-title>
-  <div *ngIf="poi.infoHtml !='' && !editionMode">
-    <img [src]="poi.infoHtml">
+<ion-card scrollY="true">
+  <ion-card-title *ngIf="editionMode" style="text-align: center"
+    >Editando POI</ion-card-title
+  >
+  <div *ngIf="poi.infoHtml != '' && !editionMode">
+    <img [src]="poi.infoHtml" />
     <ion-fab right top #fab disabled>
-      <button ion-fab *ngIf="poi.infoHtml !=''" color="white">
-        <img style="width: 44px; height: 44px;" src={{icon}}>
+      <button ion-fab *ngIf="poi.infoHtml != ''" color="white">
+        <img style="width: 44px; height: 44px;" src="{{ icon }}" />
       </button>
     </ion-fab>
   </div>
 
   <ion-card-content>
     <div *ngIf="!editionMode">
-      <ion-card-title>
-        {{poi.poiName}}
+      <ion-card-title *ngIf="!poi.question || !isFinal">
+        {{ poi.poiName }}
       </ion-card-title>
-      <p>{{poi.category}}</p>
-      <p>
-        <b>Usuario creador: </b>{{poi.creator}}</p>
-      <p>
-        <b>Se brinda el PoI: </b>{{poi.asociatedTrigger}}
+      <p *ngIf="!poi.question || !isFinal">{{ poi.category }}</p>
+      <p *ngIf="!poi.question || !isFinal">
+        <b>Usuario creador: </b>{{ poi.creator }}
       </p>
+      <p *ngIf="!poi.question || !isFinal">
+        <b>Se brinda el PoI: </b>{{ poi.asociatedTrigger }}
+      </p>
+
+      <p *ngIf="poi.question" class="question">
+        {{ poi.question }}
+      </p>
+      <!-- final user view -->
+
+      <ion-grid *ngIf="!editionMode && !mustShowEditAndDelete">
+        <ion-row>
+          <ion-col col-6>
+            <button
+              color="success"
+              ion-button
+              small
+              icon-start
+              item-end
+              (click)="sendAnswer('true')"
+              style="margin-left:20%; margin-right: 20%; width: 60%;"
+            >
+              Verdadero
+            </button>
+          </ion-col>
+          <ion-col col-6>
+            <button
+              color="danger"
+              ion-button
+              small
+              icon-start
+              item-end
+              (click)="sendAnswer('false')"
+              style="margin-left:20%; margin-right: 20%; width: 60%;"
+            >
+              Falso
+            </button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <!-- edition view -->
+      <p *ngIf="poi.answer && mustShowEditAndDelete">
+        <b>Respuesta: </b>{{ poi.answer === "true" ? "Verdadero" : "Falso" }}
+      </p>
+
+      <!-- poi info -->
       <ion-list *ngIf="mustShowSwitchPoiVisibility">
         <ion-item>
           <ion-icon ios="ios-eye" md="md-eye" item-start></ion-icon>
           <ion-label>
             <b>POI visible:</b>
           </ion-label>
-          <ion-checkbox color="myBlueColour" item-end [(ngModel)]="poi.visible" (ionChange)="changePoiVisual(poi.visible)"></ion-checkbox>
+          <ion-checkbox
+            color="myBlueColour"
+            item-end
+            [(ngModel)]="poi.visible"
+            (ionChange)="changePoiVisual(poi.visible)"
+          ></ion-checkbox>
         </ion-item>
       </ion-list>
     </div>
     <ion-item *ngIf="editionMode" style="padding-left:0px; padding-top: 2%">
       <ion-label color="myBlueColour" stacked>Nombre / Título:</ion-label>
-      <ion-input #inputNamePoi type="text" min=1 max=20 placeholder="Este es el título del PoI" [(ngModel)]="editedPoi.poiName">{{editedPoi.poiName}}</ion-input>
+      <ion-input
+        #inputNamePoi
+        type="text"
+        min="1"
+        max="20"
+        placeholder="Este es el título del PoI"
+        [(ngModel)]="editedPoi.poiName"
+        >{{ editedPoi.poiName }}</ion-input
+      >
     </ion-item>
     <ion-item *ngIf="editionMode" style="padding-left:0px;">
       <ion-label color="myBlueColour" stacked>Descripción:</ion-label>
-      <ion-textarea type="text" min=5 max=500 placeholder="Esta es una descripción del PoI" [(ngModel)]="editedPoi.category">{{editedPoi.category}}</ion-textarea>
+      <ion-textarea
+        type="text"
+        min="5"
+        max="500"
+        placeholder="Esta es una descripción del PoI"
+        [(ngModel)]="editedPoi.category"
+        >{{ editedPoi.category }}</ion-textarea
+      >
     </ion-item>
+
+    <ion-item style="padding-left:0px;" *ngIf="editionMode && hasQuestions">
+      <ion-label color="myBlueColour" stacked>Pregunta:</ion-label>
+      <ion-textarea
+        type="text"
+        min="5"
+        max="500"
+        placeholder="Esta es una pregunta para el PoI"
+        [(ngModel)]="editedPoi.question"
+        >{{ editedPoi.question }}</ion-textarea
+      >
+    </ion-item>
+
+    <ion-list
+      radio-group
+      [(ngModel)]="editedPoi.answer"
+      *ngIf="editionMode && hasQuestions"
+    >
+      <ion-list-header
+        style="padding-left: 0px;
+      margin-bottom: 0px;
+      margin-top: -19px;
+      border-top: none;
+      color: #1576C9;
+      font-size: 12px;"
+      >
+        Respuesta:
+      </ion-list-header>
+
+      <ion-item>
+        <ion-label>Falso</ion-label>
+        <ion-radio value="false"></ion-radio>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Verdadero</ion-label>
+        <ion-radio value="true'"></ion-radio>
+      </ion-item>
+    </ion-list>
+
     <ion-item *ngIf="editionMode" style="padding-left:0px;">
       <ion-label style="color: black">Brindar el PoI:</ion-label>
-      <ion-select style="max-width: 100%;" (ionChange)="cambioFormaBrindarPoi($event)"
-        class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" [(ngModel)]="editedPoi.asociatedTrigger">
+      <ion-select
+        style="max-width: 100%;"
+        (ionChange)="cambioFormaBrindarPoi($event)"
+        class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante"
+        [(ngModel)]="editedPoi.asociatedTrigger"
+      >
         <ion-option *ngFor="let option of options" value="{{ option }}">
           {{ option }}
         </ion-option>
@@ -50,13 +160,29 @@
     <ion-grid *ngIf="editionMode">
       <ion-row>
         <ion-col col-6>
-          <button [disabled]="editedPoi.poiName=='' || editedPoi.category==''" color="myBlueColour" ion-button small icon-start item-end
-            (click)="saveEditedPoi(editedPoi);" style="margin-left:20%; margin-right: 20%; width: 60%;">
+          <button
+            [disabled]="editedPoi.poiName == '' || editedPoi.category == ''"
+            color="myBlueColour"
+            ion-button
+            small
+            icon-start
+            item-end
+            (click)="saveEditedPoi(editedPoi)"
+            style="margin-left:20%; margin-right: 20%; width: 60%;"
+          >
             Guardar
           </button>
         </ion-col>
         <ion-col col-6>
-          <button color="danger" ion-button small icon-start item-end (click)="switchEditionMode()" style="margin-left:20%; margin-right: 20%; width: 60%;">
+          <button
+            color="danger"
+            ion-button
+            small
+            icon-start
+            item-end
+            (click)="switchEditionMode()"
+            style="margin-left:20%; margin-right: 20%; width: 60%;"
+          >
             Cancelar
           </button>
         </ion-col>
@@ -65,13 +191,29 @@
     <ion-grid *ngIf="!editionMode && mustShowEditAndDelete">
       <ion-row>
         <ion-col col-6>
-          <button color="myBlueColour" ion-button small icon-start item-end (click)="switchEditionMode();" style="margin-left:20%; margin-right: 20%; width: 60%;">
+          <button
+            color="myBlueColour"
+            ion-button
+            small
+            icon-start
+            item-end
+            (click)="switchEditionMode()"
+            style="margin-left:20%; margin-right: 20%; width: 60%;"
+          >
             <ion-icon ios="ios-create" md="md-create"></ion-icon>
             Editar
           </button>
         </ion-col>
         <ion-col col-6>
-          <button color="danger" ion-button small icon-start item-end (click)="deletePoi(poi)" style="margin-left:20%; margin-right: 20%; width: 60%;">
+          <button
+            color="danger"
+            ion-button
+            small
+            icon-start
+            item-end
+            (click)="deletePoi(poi)"
+            style="margin-left:20%; margin-right: 20%; width: 60%;"
+          >
             <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
             Eliminar
           </button>

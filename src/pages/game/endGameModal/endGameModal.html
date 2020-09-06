@@ -1,0 +1,57 @@
+<ion-card scrollY="true" style="margin-top: 36vh; width:90%; margin-left:3vh;">
+  <ion-card-title style="text-align: center">Juego Terminado</ion-card-title>
+
+  <ion-card-content overflow-scroll="false">
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      style="padding-left:0px; margin-top: -10px;"
+    >
+      <div style="text-align: center;">
+        <p>
+          Felicitaciones!!! Respondiste las preguntas. Has obtenido
+          <b>{{ points }} puntos</b> en <b>{{ time }} segundos</b>.
+        </p>
+
+        <hr />
+        <div>
+          Para finalizar el juego, vuelve al stand e ingresa el código que te
+          entregarán.
+        </div>
+
+        <div class="hr"></div>
+
+        <ion-item
+          [class.ng-invalid]="
+            form.get('code').invalid && form.get('code').dirty
+          "
+        >
+          <ion-label color="myBlueColour" stacked>Código:</ion-label>
+          <ion-input
+            formControlName="code"
+            type="text"
+            min="1"
+            max="20"
+            placeholder="Ingrese el código aquí"
+            >{{ code }}</ion-input
+          >
+        </ion-item>
+      </div>
+      <div style="text-align: center">
+        <!-- <button ion-button color="danger" (click)="answer(false)">
+        Cancelar
+      </button> -->
+        <button
+          style="min-width: 65px; margin-top: 15px;"
+          ion-button
+          color="myBlueColour"
+          type="submit"
+          [disabled]="!form.valid"
+        >
+          <ion-spinner *ngIf="isLoading"></ion-spinner>
+          <p style="color: white" *ngIf="!isLoading">Enviar</p>
+        </button>
+      </div>
+    </form>
+  </ion-card-content>
+</ion-card>

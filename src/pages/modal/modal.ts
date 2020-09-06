@@ -1,16 +1,30 @@
-import { Component, ViewChild, NgZone } from '@angular/core';
-import { Platform, NavParams, ViewController, AlertController, ModalController, Events, LoadingController } from 'ionic-angular';
-import { ModalDeletePOI } from '../modalDeletePoi/modalDeletePoi';
-import { PoisService, Poi } from '../../services/pois.service';
-import { WorkspaceService } from '../../services/workspace.service';
-import { Workspace, EdicionDelCreador, EdicionColaborativa, EdicionDelCreadorVersionFinal, VersionFinalPublica } from '../../services/workspace.service';
-import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner'; //lee QR
-
-
+import { Component, ViewChild, NgZone } from "@angular/core";
+import {
+  Platform,
+  NavParams,
+  ViewController,
+  AlertController,
+  ModalController,
+  Events,
+  LoadingController
+} from "ionic-angular";
+import { ModalDeletePOI } from "../modalDeletePoi/modalDeletePoi";
+import { PoisService, Poi } from "../../services/pois.service";
+import { WorkspaceService } from "../../services/workspace.service";
+import {
+  Workspace,
+  EdicionDelCreador,
+  EdicionColaborativa,
+  EdicionDelCreadorVersionFinal,
+  VersionFinalPublica
+} from "../../services/workspace.service";
+import { QRScanner, QRScannerStatus } from "@ionic-native/qr-scanner"; //lee QR
+import { GameService } from "../../services/game.service";
+import { environment } from "../../env/environment";
 
 @Component({
-  selector: 'page-modal',
-  templateUrl: 'modal.html',
+  selector: "page-modal",
+  templateUrl: "modal.html"
 })
 export class ModalContentPage {
   poi: Poi;
@@ -35,6 +49,8 @@ export class ModalContentPage {
   ionModal: any;
   modelQRPoi: string;
   loggedUser: any;
+
+  isFinalUser: boolean;
   constructor(
     public platform: Platform,
     public viewCtrl: ViewController,
@@ -47,36 +63,48 @@ export class ModalContentPage {
     private zone: NgZone,
     public events: Events,
     public loadingCtrl: LoadingController,
+    private gameService: GameService
   ) {
     this.editionMode = false;
     this.poi = this.navParams.get("poi");
     this.editedPoi = Object.assign({}, this.poi);
     this.workspace = this.navParams.get("workspace");
     this.userLogged = this.navParams.get("userLogged");
+
     this.options = ["Usando WLAN", "Nuevo QR", "QR Existente"];
     this.colorString = this.poi.colour.substring(1);
     this.statusString = this.workspace.status.idStatus;
     this.isWorkspaceOwner = this.isOwner();
     this.showEditAndDelete();
     this.showSwithPoiVisibility();
-    if(this.workspace.status.idStatus!= "VersionFinalPublica"){
+    if (this.workspace.status.idStatus != "VersionFinalPublica") {
       if (this.poi.hasQRCode) {
         this.icon = "assets/img/" + "pinPoiQR" + this.colorString + ".png";
       } else {
         this.icon = "assets/img/" + "pinPoi" + this.colorString + ".png";
       }
-    }else{
+    } else {
       if (this.poi.hasQRCode) {
-        this.icon = "assets/img/" + "pinPoiQR" + this.workspace.applicationColour.substring(1) + ".png";
+        this.icon =
+          "assets/img/" +
+          "pinPoiQR" +
+          this.workspace.applicationColour.substring(1) +
+          ".png";
       } else {
-        this.icon = "assets/img/" + "pinPoi" + this.workspace.applicationColour.substring(1) + ".png";
+        this.icon =
+          "assets/img/" +
+          "pinPoi" +
+          this.workspace.applicationColour.substring(1) +
+          ".png";
       }
     }
-    
-    this.workspaceService.subscribeToWorkspaceStateChangesFromModal(this.workspace, this);
+
+    this.workspaceService.subscribeToWorkspaceStateChangesFromModal(
+      this.workspace,
+      this
+    );
   }
   public unregisterBackButtonAction: any; //Boton hacia atrás
-
 
   navigateToPoi() {
     this.viewCtrl.dismiss(this.poi);
@@ -86,10 +114,15 @@ export class ModalContentPage {
     this.viewCtrl.dismiss();
   }
 
-  deletePoi() { //STATE PATTERN
-    let modalDeletePoi = this.modalCtrl.create(ModalDeletePOI, { cssClass: 'modal-not-fullscreen-size', poi: this.poi });
+  deletePoi() {
+    //STATE PATTERN
+    let modalDeletePoi = this.modalCtrl.create(ModalDeletePOI, {
+      cssClass: "modal-not-fullscreen-size",
+      poi: this.poi
+    });
     modalDeletePoi.onDidDismiss(response => {
-      if (response) { //BORRARÁ SÓLO SI EL ESTADO LO DEJA
+      if (response) {
+        //BORRARÁ SÓLO SI EL ESTADO LO DEJA
         this.workspace.status.deletePoi(this, this.isOwner(), this.poi);
       }
     });
@@ -102,45 +135,72 @@ export class ModalContentPage {
         this.events.publish("disposeMarker", this.poi);
         this.dismiss();
       } else {
-        this.alertText("ERROR", "Se produjo un error al eliminar el PoI. Intente nuevamente.");
+        this.alertText(
+          "ERROR",
+          "Se produjo un error al eliminar el PoI. Intente nuevamente."
+        );
       }
     });
   }
 
   justOwnerCanDelete() {
-    this.alertText("No se puede eliminar", "Solo se permite que el propietario del workspace realice modificaciones.");
+    this.alertText(
+      "No se puede eliminar",
+      "Solo se permite que el propietario del workspace realice modificaciones."
+    );
   }
 
   justOwnerCanEdit() {
-    this.alertText("No se puede editar", "Solo se permite que el propietario del workspace realice modificaciones.");
+    this.alertText(
+      "No se puede editar",
+      "Solo se permite que el propietario del workspace realice modificaciones."
+    );
   }
 
   cantDelete() {
-    this.alertText("No se puede eliminar", "El propietario ha cerrado el workspace y no admite modificaciones.");
+    this.alertText(
+      "No se puede eliminar",
+      "El propietario ha cerrado el workspace y no admite modificaciones."
+    );
   }
 
   cantEdit() {
-    this.alertText("No se puede editar", "El propietario ha cerrado el workspace y no admite modificaciones.");
+    this.alertText(
+      "No se puede editar",
+      "El propietario ha cerrado el workspace y no admite modificaciones."
+    );
   }
 
   changePoiVisual(visible) {
-    this.poisService.updatePoiVisibility(this.poi, this.workspace, visible).then(response => {
-      if (!response) {
-        this.alertText("ERROR", "Hubo un error al intentar cambiar la visibilidad del POI. Intente nuevamente.");
-      }
-    });
+    this.poisService
+      .updatePoiVisibility(this.poi, this.workspace, visible)
+      .then(response => {
+        if (!response) {
+          this.alertText(
+            "ERROR",
+            "Hubo un error al intentar cambiar la visibilidad del POI. Intente nuevamente."
+          );
+        }
+      });
   }
 
   public scanToUseExistingQR() {
     // Optionally request the permission early
-    this.qrScanner.prepare()
+    this.qrScanner
+      .prepare()
       .then((status: QRScannerStatus) => {
         if (status.authorized) {
           this.qrAutorizado = true;
           this.inicializarSalidaHaciaAtras();
-          this.ionApp = <HTMLElement>document.getElementsByTagName("ion-app")[0];
-          this.pageModal = <HTMLElement>document.getElementsByTagName("page-modal")[0];
-          this.ionModal = <HTMLElement>document.getElementsByTagName("ion-modal")[0];
+          this.ionApp = <HTMLElement>(
+            document.getElementsByTagName("ion-app")[0]
+          );
+          this.pageModal = <HTMLElement>(
+            document.getElementsByTagName("page-modal")[0]
+          );
+          this.ionModal = <HTMLElement>(
+            document.getElementsByTagName("ion-modal")[0]
+          );
           this.ionApp.style.opacity = "0";
           this.pageModal.style.opacity = "0";
           this.ionModal.style.opacity = "0";
@@ -170,13 +230,15 @@ export class ModalContentPage {
           // permission was denied, but not permanently. You can ask for permission again at a later time.
         }
       })
-      .catch((e: any) => console.log('Error is', e));
+      .catch((e: any) => console.log("Error is", e));
   }
 
   inicializarSalidaHaciaAtras() {
-    this.unregisterBackButtonAction = this.platform.registerBackButtonAction(() => {
-      this.customHandleBackButton(false);
-    });
+    this.unregisterBackButtonAction = this.platform.registerBackButtonAction(
+      () => {
+        this.customHandleBackButton(false);
+      }
+    );
   }
 
   private customHandleBackButton(aBoolean): void {
@@ -191,10 +253,16 @@ export class ModalContentPage {
     this.qrAutorizado = false;
     this.unregisterBackButtonAction && this.unregisterBackButtonAction();
     if (!seHaEscaneado) {
-      this.alertText("ATENCIÓN:", 'Se volvió a seleccionar la opción "' + this.editedPoi.asociatedTrigger + '" debido a que no ha escaneado ningún código.');
+      this.alertText(
+        "ATENCIÓN:",
+        'Se volvió a seleccionar la opción "' +
+          this.editedPoi.asociatedTrigger +
+          '" debido a que no ha escaneado ningún código.'
+      );
     } else {
-      if (this.editedPoi.QRCodeID == this.poi.QRCodeID) { //NO SE MODIFICÓ
-        this.alertText("ATENCIÓN", 'Se debe escanear un código distinto.');
+      if (this.editedPoi.QRCodeID == this.poi.QRCodeID) {
+        //NO SE MODIFICÓ
+        this.alertText("ATENCIÓN", "Se debe escanear un código distinto.");
         this.editedPoi.asociatedTrigger = this.poi.asociatedTrigger;
       }
     }
@@ -212,7 +280,7 @@ export class ModalContentPage {
         this.scanToUseExistingQR(); //ALGUN QR QUE YA EXISTA (DEBERIA SER HASHEADO)
       }
       if (anElection == "Nuevo QR") {
-        this.editedPoi.QRCodeID = this.editedPoi.poiName; //EL NOMBRE (DEBERIA SER HASHEADO)  
+        this.editedPoi.QRCodeID = this.editedPoi.poiName; //EL NOMBRE (DEBERIA SER HASHEADO)
       }
       this.editedPoi.hasQRCode = true;
     }
@@ -221,18 +289,25 @@ export class ModalContentPage {
   saveChanges() {
     this.loadingSave = this.createLoading("Guardando cambios...");
     this.loadingSave.present();
-    this.poisService.updatePoi(this.editedPoi, this.workspace).then(response => {
-      if (!response) {
-        this.alertText("ERROR", "Hubo un error al editar el POI. Intente nuevamente.");
-        this.hideLoading(this.loadingSave);
-      } else {
-        this.poi.poiName = this.editedPoi.poiName;
-        this.poi.category = this.editedPoi.category;
-        this.poi.asociatedTrigger = this.editedPoi.asociatedTrigger;
-        this.hideLoading(this.loadingSave);
-        this.switchEditionMode();
-      }
-    });
+    this.poisService
+      .updatePoi(this.editedPoi, this.workspace)
+      .then(response => {
+        if (!response) {
+          this.alertText(
+            "ERROR",
+            "Hubo un error al editar el POI. Intente nuevamente."
+          );
+          this.hideLoading(this.loadingSave);
+        } else {
+          this.poi.poiName = this.editedPoi.poiName;
+          this.poi.category = this.editedPoi.category;
+          this.poi.answer = this.editedPoi.answer;
+          this.poi.question = this.editedPoi.question;
+          this.poi.asociatedTrigger = this.editedPoi.asociatedTrigger;
+          this.hideLoading(this.loadingSave);
+          this.switchEditionMode();
+        }
+      });
   }
 
   public okEncrypt(aBase64, loading) {
@@ -244,20 +319,40 @@ export class ModalContentPage {
   public notOkEncrypt(loading, err) {
     loading.dismiss();
     console.dir(err);
-    this.alertText("Error", "Se produjo un error al generar el código QR. Intente nuevamente.")
+    this.alertText(
+      "Error",
+      "Se produjo un error al generar el código QR. Intente nuevamente."
+    );
   }
 
   editFromFirebase(editedPoi) {
-    let seModificoElTexto = ((editedPoi.poiName != this.poi.poiName) || (editedPoi.category != this.poi.category));
-    let seModificoLaFormaDeBrindarPoi = (this.editedPoi.asociatedTrigger != this.poi.asociatedTrigger);
+    let seModificoElTexto =
+      editedPoi.poiName != this.poi.poiName ||
+      editedPoi.category != this.poi.category;
+    let seModificoLaFormaDeBrindarPoi =
+      this.editedPoi.asociatedTrigger != this.poi.asociatedTrigger;
+
+    let seModificoLaPregunta =
+      this.poi.question != editedPoi.question ||
+      this.poi.answer != editedPoi.answer;
+
     debugger;
     let loading;
-    if (seModificoElTexto || seModificoLaFormaDeBrindarPoi) { //SI NO SE CAMBIO NADA NO MANDO A GUARDAR NADA
-      if (this.editedPoi.hasQRCode) { //SI TIENE QR TENGO QUE ENCRIPTARLO Y LUEGO CUARDA EN EL OK
+    if (
+      seModificoElTexto ||
+      seModificoLaFormaDeBrindarPoi ||
+      seModificoLaPregunta
+    ) {
+      //SI NO SE CAMBIO NADA NO MANDO A GUARDAR NADA
+      if (this.editedPoi.hasQRCode) {
+        //SI TIENE QR TENGO QUE ENCRIPTARLO Y LUEGO CUARDA EN EL OK
         loading = this.createLoading("Encriptando código QR");
         loading.present();
-        this.poisService.encriptQR(this.editedPoi, this, loading).then((result) => { });
-      } else { //SI NO TIENE QR GUARDO DIRECTAMENTE
+        this.poisService
+          .encriptQR(this.editedPoi, this, loading)
+          .then(result => {});
+      } else {
+        //SI NO TIENE QR GUARDO DIRECTAMENTE
         this.saveChanges();
       }
     } else {
@@ -285,7 +380,7 @@ export class ModalContentPage {
     let alert = this.alertCtrl.create({
       title: aTitle,
       subTitle: aSubTitle,
-      buttons: ['Cerrar']
+      buttons: ["Cerrar"]
     });
     alert.present();
   }
@@ -331,17 +426,39 @@ export class ModalContentPage {
   }
 
   isOwner() {
-    return (this.workspace.idOwner == this.userLogged.uid);
+    return this.workspace.idOwner == this.userLogged.uid;
   }
 
   showSwithPoiVisibility() {
-    this.mustShowSwitchPoiVisibility = (this.isWorkspaceOwner && this.statusString == "EdicionDelCreadorVersionFinal");
+    this.mustShowSwitchPoiVisibility =
+      this.isWorkspaceOwner &&
+      this.statusString == "EdicionDelCreadorVersionFinal";
     //SI SOY OWNER Y SÓLO SI ESTÁ EN ESTADO "NO EDITABLE"
   }
 
   showEditAndDelete() {
-    this.mustShowEditAndDelete = ((this.isWorkspaceOwner && this.statusString != "VersionFinalPublica") || (!this.isWorkspaceOwner && this.statusString == "EdicionColaborativa"));
+    this.mustShowEditAndDelete =
+      (this.isWorkspaceOwner && this.statusString != "VersionFinalPublica") ||
+      (!this.isWorkspaceOwner && this.statusString == "EdicionColaborativa");
     //SI SOY OWNER Y AÚN ES EDITABLE o... SI NO SOW OWNER Y SE ENCUENTRA EN ESTADO DE EDICIÓN COLABORATIVA
   }
 
-} 
+  // GAME
+
+  sendAnswer(value: string) {
+    console.log("sending", value);
+    this.gameService.answerQuestion(this.poi, value);
+    console.log("poi", this.poi);
+    console.log("editedPoi", this.editedPoi);
+    console.log("response", value);
+    this.viewCtrl.dismiss(value);
+  }
+
+  get hasQuestions(): boolean {
+    return this.poi.question ? true : false;
+  }
+
+  get isFinal() {
+    return this.statusString === "VersionFinalPublica";
+  }
+}

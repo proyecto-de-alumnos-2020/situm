@@ -1,6 +1,5 @@
 // http://ionicframework.com/docs/v2/theming/
 
-
 // App Global Sass
 // --------------------------------------------------
 // Put style rules here that you want to apply globally. These
@@ -14,10 +13,15 @@
 // To declare rules for a specific mode, create a child rule
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
-ion-modal{
-   background: rgba(0,0,0,0.5);
-  
+ion-modal {
+  background: rgba(0, 0, 0, 0.5);
 }
+
+.select-modal {
+  background: rgba(0, 0, 0, 0.5) !important;
+  padding: 13vh 4% !important;
+}
+
 .item {
   min-height: 3rem; /* <- this can be whatever you need */
 }
@@ -43,18 +47,19 @@ ion-modal{
   width: auto;
 }
 ::-webkit-scrollbar-thumb {
-  background: color($colors, 'myBlueColour');
+  background: color($colors, "myBlueColour");
 }
 
 //PARA EL COLOR DINAMICO DEBO MODIFICAR LOS ESTILOS
-.toolbar-background { //SINO TOMA EL COLOR DEFAULT
+.toolbar-background {
+  //SINO TOMA EL COLOR DEFAULT
   background: none;
 }
-.bar-button-menutoggle-md ion-icon { //SINO TOMA COLOR GRIS POR DEFAULT
-  color:white !important;
+.bar-button-menutoggle-md ion-icon {
+  //SINO TOMA COLOR GRIS POR DEFAULT
+  color: white !important;
 }
 
 .toolbar-title {
   color: white !important;
 }
-
