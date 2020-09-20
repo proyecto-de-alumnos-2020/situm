@@ -22,6 +22,10 @@
             md="md-create" item-start></ion-icon>
           {{ws.name}}
         </button>
+        <button color="danger" ion-button small icon-start item-end (click)="deleteFromFirebase()" style="margin-left:10%; margin-right: 10%; width: 80%;">
+          <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
+          Eliminar todos los Workspaces
+        </button>
       </ion-list>
       <div *ngIf="workspaces.length == 0">
         <p *ngIf="tipoWorkspaces == 'misWorkspaces'" style="color:gray; font-size: 14px; text-align: center; padding-top: 2%;">No hay workscpaces propias</p>

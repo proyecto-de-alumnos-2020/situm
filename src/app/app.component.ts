@@ -1,44 +1,40 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild } from '@angular/core';
 import {
   Platform,
   Events,
   LoadingController,
   ToastController,
   AlertController,
-  ModalController
-} from "ionic-angular";
-import { StatusBar } from "@ionic-native/status-bar";
-import { SplashScreen } from "@ionic-native/splash-screen";
-import { PositioningPage } from "../pages/positioning/positioning";
-import { BuildingsService, Building } from "../services/buildings.service";
+  ModalController,
+} from 'ionic-angular';
+import { StatusBar } from '@ionic-native/status-bar';
+import { SplashScreen } from '@ionic-native/splash-screen';
+import { PositioningPage } from '../pages/positioning/positioning';
+import { BuildingsService, Building } from '../services/buildings.service';
 import {
   WorkspaceService,
   Workspace,
-  WorkspaceStatus,
   EdicionDelCreador,
   EdicionColaborativa,
   EdicionDelCreadorVersionFinal,
   VersionFinalPublica,
-  Kind,
   RecorridoLineal,
   CrearLugaresRelevantes,
-  Params,
-  CrearLugaresRelevantesConPreguntas
-} from "../services/workspace.service";
-import { User } from "../services/login.service";
-import { ModalNewWorkspace } from "../pages/nuevoWorkspace/newWorkspace";
+  CrearLugaresRelevantesConPreguntas,
+} from '../services/workspace.service';
+import { User } from '../services/login.service';
+import { ModalNewWorkspace } from '../pages/nuevoWorkspace/newWorkspace';
 
 /*import { app } from 'firebase';*/
-import { ModalWorkspacesList } from "../pages/modalWorkspacesList/modalWorkspacesList";
-import { ModalExitApp } from "../pages/modalExitApp/modalExitApp";
-import { Subscription } from "rxjs";
-import { Network } from "@ionic-native/network";
-import { Diagnostic } from "@ionic-native/diagnostic"; //GPS ENCENDIDO
-import { BlockScreenPage } from "../pages/blockScreen/blockScreen";
+import { ModalWorkspacesList } from '../pages/modalWorkspacesList/modalWorkspacesList';
+import { Subscription } from 'rxjs';
+import { Network } from '@ionic-native/network';
+import { Diagnostic } from '@ionic-native/diagnostic'; //GPS ENCENDIDO
+import { Situm, Fixed } from '../services/positioning.service';
 declare var cordova: any;
 
 @Component({
-  templateUrl: "app.html"
+  templateUrl: 'app.html',
 })
 export class MyApp {
   rootPage: any = PositioningPage;
@@ -84,26 +80,26 @@ export class MyApp {
         .onDisconnect()
         .subscribe(() => {
           //PREGUNTAR SI TENGO PRENDIDO EL WIFI O LOS DATOS
-          this.diagnostic.isWifiEnabled().then(isEnabled => {
+          this.diagnostic.isWifiEnabled().then((isEnabled) => {
             if (!isEnabled) {
               //SI ESTÁ PRENDIDO EL WIFI...
               let alert = this.alertCtrl.create({
-                title: "AVISO",
+                title: 'AVISO',
                 subTitle:
-                  "Se logra una conexión más estable a través de una conexión wifi.",
-                buttons: ["Cerrar"]
+                  'Se logra una conexión más estable a través de una conexión wifi.',
+                buttons: ['Cerrar'],
               });
               alert.present();
-              alert.onDidDismiss(data => {
+              alert.onDidDismiss((data) => {
                 this.loadingConnection = this.createLoading(
-                  "Conexión de internet perdida. Reconectando..."
+                  'Conexión de internet perdida. Reconectando...'
                 );
                 this.loadingConnection.present();
               });
             } else {
               //SI NO ESTÁ PRENDIDO EL WIFI
               this.loadingConnection = this.createLoading(
-                "Conexión de internet perdida. Reconectando..."
+                'Conexión de internet perdida. Reconectando...'
               );
               this.loadingConnection.present();
             }
@@ -134,27 +130,27 @@ export class MyApp {
         // Here you can do any higher level native things you might need.
         //statusBar.styleDefault();
         this.statusBar.overlaysWebView(false);
-        this.statusBar.backgroundColorByHexString("#000000");
+        this.statusBar.backgroundColorByHexString('#000000');
         this.splashScreen.hide();
         this.platform.pause.subscribe(() => {
           //Subscribe al "minimizado de la aplicación"
           this.minimizeApp();
         });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
 
-    this.events.subscribe("functionCall:successLogin", aUserLogged => {
+    this.events.subscribe('functionCall:successLogin', (aUserLogged) => {
       this.loadingTool = this.createLoading(
-        "Cargando entorno de Authoring Tool..."
+        'Cargando entorno de Authoring Tool...'
       );
       this.loadingTool.present();
       /*INICIO LLAMADOS A SITUM Para crear un workspace necesito EL EDIFICIO DE SITUM CON SUS PISOS que le voy a asociar*/
-      this.buildingsService.fetchBuildings().then(resPromesa => {
+      this.buildingsService.fetchBuildings().then((resPromesa) => {
         if (resPromesa) {
           this.edificios = resPromesa;
-          console.log("EDIFICIOS TRAIDOS");
+          console.log('EDIFICIOS TRAIDOS');
           console.log(resPromesa);
           this.loadedResources = this.loadedResources + 1;
           this.hideLoadingResources();
@@ -164,49 +160,27 @@ export class MyApp {
 
       /*INICIO DE LLAMADOS A FIREBASE*/
       this.loggedUser = aUserLogged; //MANDO LOS DATOS DEL USUARIO LOGUEADO A LA APP PRINCIPAL PARA QUE TENGA ACCESO EL MENU PRINCIPAL
-      let message;
       this.workspaceService
         .getWorkspaces(this.loggedUser.uid)
-        .then(ownWorkspacesResult => {
-          if (ownWorkspacesResult) {
-            console.log("WORKSPACES PROPIOS TRAIDOS");
-            console.log(ownWorkspacesResult);
-            this.loadedResources = this.loadedResources + 1;
-            this.hideLoadingResources();
-            debugger;
-            this.setWorkspaces(ownWorkspacesResult);
-          } else {
-            message =
-              "Hubo un error al obtener los workspaces, intente nuevamente.";
-            this.presentToast(message, "top", null);
-          }
+        .then((ownWorkspacesResult) => {
+          console.log('ownWorkspacesResult', ownWorkspacesResult);
+          this.initializeWorskpaces(ownWorkspacesResult);
         });
 
       this.workspaceService
         .getWorkspacesReferences(this.loggedUser.uid)
-        .then(references => {
-          debugger;
-          console.log("QUE TENIAN LAS REFERENCIAS?");
-          console.log(references);
-          console.log("EL USER TENIA:");
-          console.log(this.loggedUser);
-          if (references.length != 0) {
-            debugger;
-            this.getWorkspacesFromReferences(references);
-          } else {
-            this.loadedResources = this.loadedResources + 1; //SI NO TIENE REFERENCIAS TENGO QUE ASUMIR QUE YA SE CARGÓ
-            this.hideLoadingResources();
-          }
+        .then((references) => {
+          this.initializeReferences(references);
         });
       /*FIN DE LLAMADOS A FIREBASE*/
     });
 
-    this.events.subscribe("addWorkspaceAsCollaborator", wsReference => {
+    this.events.subscribe('addWorkspaceAsCollaborator', (wsReference) => {
       this.importWorkspaceFromAnotherUser2(wsReference);
       //this.alertText("idOwner: "+idOwnerAndIdWorkspaceStringArray[0], "idWorkspace: "+idOwnerAndIdWorkspaceStringArray[1])
     });
 
-    this.events.subscribe("logout", () => {
+    this.events.subscribe('logout', () => {
       this.myWorkspaces = undefined;
       this.myWorkSpacesAsCollaborator = new Array<Workspace>();
       this.myWorkSpacesAsFinalUser = new Array<Workspace>();
@@ -215,9 +189,37 @@ export class MyApp {
     });
   }
 
+  initializeWorskpaces(ownWorkspacesResult) {
+    if (ownWorkspacesResult) {
+      console.log('WORKSPACES PROPIOS TRAIDOS');
+      console.log(ownWorkspacesResult);
+      this.loadedResources = this.loadedResources + 1;
+      this.hideLoadingResources();
+      this.setWorkspaces(ownWorkspacesResult);
+    } else {
+      let message =
+        'Hubo un error al obtener los workspaces, intente nuevamente.';
+      this.presentToast(message, 'top', null);
+    }
+  }
+
+  initializeReferences(references) {
+    console.log('QUE TENIAN LAS REFERENCIAS?');
+    console.log(references);
+    console.log('EL USER TENIA:');
+    console.log(this.loggedUser);
+    if (references.length != 0) {
+      debugger;
+      this.getWorkspacesFromReferences(references);
+    } else {
+      this.loadedResources = this.loadedResources + 1; //SI NO TIENE REFERENCIAS TENGO QUE ASUMIR QUE YA SE CARGÓ
+      this.hideLoadingResources();
+    }
+  }
+
   hideLoadingResources() {
     //Edificios, Workspaces y Workspaces as collaborator (3 recursos en total)
-    console.log("CANTIDAD DE RECURSOS CARGADOS");
+    console.log('CANTIDAD DE RECURSOS CARGADOS');
     console.log(this.loadedResources);
     if (this.loadedResources == 3) {
       //Por eso pregunto por 3.
@@ -229,16 +231,16 @@ export class MyApp {
   getCurrentStatus(aStringStatusClass) {
     //DEBERÍA SER POR REFLECTION
     switch (aStringStatusClass) {
-      case "EdicionDelCreador": {
+      case 'EdicionDelCreador': {
         return new EdicionDelCreador();
       }
-      case "EdicionColaborativa": {
+      case 'EdicionColaborativa': {
         return new EdicionColaborativa();
       }
-      case "EdicionDelCreadorVersionFinal": {
+      case 'EdicionDelCreadorVersionFinal': {
         return new EdicionDelCreadorVersionFinal();
       }
-      case "VersionFinalPublica": {
+      case 'VersionFinalPublica': {
         return new VersionFinalPublica();
       }
     }
@@ -246,40 +248,39 @@ export class MyApp {
   getKind(aStringKindClass) {
     //DEBERÍA SER POR REFLECTION
     switch (aStringKindClass) {
-      case "CrearLugaresRelevantes": {
+      case 'CrearLugaresRelevantes': {
         return new CrearLugaresRelevantes();
       }
-      case "CrearLugaresRelevantesConPreguntas": {
+      case 'CrearLugaresRelevantesConPreguntas': {
         return new CrearLugaresRelevantesConPreguntas();
       }
-      case "RecorridoLineal": {
+      case 'RecorridoLineal': {
         return new RecorridoLineal();
       }
     }
   }
 
+  public getPositioning(aStringPositioningClass) {
+    //DEBERÍA SER POR REFLECTION
+    switch (aStringPositioningClass) {
+      case 'Fixed': {
+        return new Fixed();
+      }
+      case 'Situm':
+      default: {
+        return new Situm();
+      }
+    }
+  }
+
   prepareWorkspacesStatusesAndKind(aWorkspaces) {
-    aWorkspaces.forEach(ws => {
-      debugger;
+    aWorkspaces.forEach((ws) => {
       let statusClassString = ws.status.idStatus;
       let kindClassString = ws.kind.idKind;
+      let positioningClassString = ws.positioning.idPositioning;
       ws.status = this.getCurrentStatus(statusClassString);
       ws.kind = this.getKind(kindClassString);
-      //import { WorkspaceService, Workspace, StatusWorkspace, RestrictedEdition, UnrestrictedEdition, Published } from '../services/workspace.service';
-      /*const dynModule = require('./' + _.snakeCase(classTypeString));
-      const klass = dynModule[classTypeString];
-      let instance: SomeInterface = new klass();
-      instance.structuredData = foo;*/
-      //eval(`new ${statusClass}()`);
-      //ws.status = eval("new RestrictedEdition()");
-      /*Class<?> clazz = Class.forName(className);
-      Constructor<?> ctor = clazz.getConstructor(String.class);
-      Object object = ctor.newInstance(new Object[] { ctorArgument });*/
-      //ws.status = ObjectFactory.create(StatusClass);
-      //var greeter: Greeter = <Greeter>obj;
-      //ws.status = InstanceLoader.getInstance<StatusWorkspace>(window, ws.status); //LE CREA ESTADO(?)
-      //ws.status = new app.[StatusClass]();
-      //ws.status = <StatusWorkspace>ObjectFactory.create(StatusClass);
+      ws.positioning = this.getPositioning(positioningClassString);
     });
   }
 
@@ -288,7 +289,7 @@ export class MyApp {
     if (this.myWorkSpacesAsCollaborator.length == 0) {
       return false;
     }
-    let wasImported = this.myWorkSpacesAsCollaborator.find(function(ws) {
+    let wasImported = this.myWorkSpacesAsCollaborator.find(function (ws) {
       return ws.idWorkspace == anIdWorkspace;
     });
     if (wasImported == undefined) {
@@ -303,59 +304,59 @@ export class MyApp {
     if (!wasMyWorkspace) {
       let loadingUniendose;
       let collaboratorData = {
-        idCollaborator: "",
-        idColour: "",
+        idCollaborator: '',
+        idColour: '',
         isFinalUser: false,
-        isCollaborator: false
+        isCollaborator: false,
       };
       let collaboratorFound;
       let userColour = workspaceReference.idColour;
       this.workspaceService
         .getWorkspaceFromReference(workspaceReference)
-        .then(ws => {
+        .then((ws) => {
           ws.status = this.getCurrentStatus(ws.status.idStatus);
           debugger;
           if (ws.collaborators) {
             //SI HAY COLABORADORES, BUSCO A VER SI ESTOY
-            var collaboratorsArray = Object.keys(ws.collaborators).map(function(
-              index
-            ) {
-              let col = ws.collaborators[index];
-              return col;
-            });
+            var collaboratorsArray = Object.keys(ws.collaborators).map(
+              function (index) {
+                let col = ws.collaborators[index];
+                return col;
+              }
+            );
             collaboratorFound = collaboratorsArray.find(
-              col => col.idCollaborator == this.loggedUser.uid
+              (col) => col.idCollaborator == this.loggedUser.uid
             );
           }
 
-          console.log("ws", ws);
+          console.log('ws', ws);
 
-          if (ws.status.idStatus == "VersionFinalPublica") {
+          if (ws.status.idStatus == 'VersionFinalPublica') {
             if (!collaboratorFound) {
               //SI NO ESTABA EN LA COLECCION
               collaboratorData.idCollaborator = this.loggedUser.uid;
               collaboratorData.idColour = userColour;
               collaboratorData.isFinalUser = true;
               collaboratorData.isCollaborator = false;
-              loadingUniendose = this.createLoading("Uniéndose...");
+              loadingUniendose = this.createLoading('Uniéndose...');
               loadingUniendose.present();
               this.workspaceService
                 .addMeAsFinalUser(workspaceReference, collaboratorData)
                 .then(
-                  response => {
-                    console.log("ws", ws);
-                    console.log("response", response);
+                  (response) => {
+                    console.log('ws', ws);
+                    console.log('response', response);
                     if (
-                      ws.kind.idKind === "CrearLugaresRelevantesConPreguntas"
+                      ws.kind.idKind === 'CrearLugaresRelevantesConPreguntas'
                     ) {
                       this.alertText(
-                        "Éxito",
-                        "Se ha unido al Juego Móvil correctamente, accediendo a la opción del menú Aplicaciones finales puede empezar a jugar."
+                        'Éxito',
+                        'Se ha unido al Juego Móvil correctamente, accediendo a la opción del menú Aplicaciones finales puede empezar a jugar.'
                       );
                     } else {
                       this.alertText(
-                        "Éxito",
-                        "Se ha unido a la aplicación final correctamente. Ahora puede verlo en el listado de aplicaciones finales."
+                        'Éxito',
+                        'Se ha unido a la aplicación final correctamente. Ahora puede verlo en el listado de aplicaciones finales.'
                       );
                     }
 
@@ -363,16 +364,16 @@ export class MyApp {
                     console.log(response);
                     this.hideLoading(loadingUniendose);
                   },
-                  error => {
+                  (error) => {
                     console.log(error);
                     this.hideLoading(loadingUniendose);
                     this.alertText(
-                      "Error",
-                      "Hubo un error al unirse , intente nuevamente."
+                      'Error',
+                      'Hubo un error al unirse , intente nuevamente.'
                     );
                     const message =
-                      "Hubo un error al unirse, intente nuevamente.";
-                    this.presentToast(message, "top", null);
+                      'Hubo un error al unirse, intente nuevamente.';
+                    this.presentToast(message, 'top', null);
                   }
                 );
             } else {
@@ -385,7 +386,7 @@ export class MyApp {
                 collaboratorData.isCollaborator =
                   collaboratorFound.isCollaborator;
                 collaboratorData.isFinalUser = true;
-                loadingUniendose = this.createLoading("Uniéndose...");
+                loadingUniendose = this.createLoading('Uniéndose...');
                 loadingUniendose.present();
                 this.workspaceService
                   .updateFinalUserOrCollaborator(
@@ -393,31 +394,31 @@ export class MyApp {
                     collaboratorData
                   )
                   .then(
-                    response => {
+                    (response) => {
                       this.alertText(
-                        "Éxito",
-                        "Se ha unido a la aplicación final correctamente. Ahora puede verlo en el listado de aplicaciones finales."
+                        'Éxito',
+                        'Se ha unido a la aplicación final correctamente. Ahora puede verlo en el listado de aplicaciones finales.'
                       );
                       this.addWorkspaceAsFinalUser(ws, collaboratorData); //ACTUALIZA LA COLECCION ACTUAL
                       console.log(response);
                       this.hideLoading(loadingUniendose);
                     },
-                    error => {
+                    (error) => {
                       console.log(error);
                       this.hideLoading(loadingUniendose);
                       this.alertText(
-                        "Error",
-                        "Hubo un error al unirse , intente nuevamente."
+                        'Error',
+                        'Hubo un error al unirse , intente nuevamente.'
                       );
                       const message =
-                        "Hubo un error al unirse, intente nuevamente.";
-                      this.presentToast(message, "top", null);
+                        'Hubo un error al unirse, intente nuevamente.';
+                      this.presentToast(message, 'top', null);
                     }
                   );
               } else {
                 this.alertText(
-                  "AVISO",
-                  "Ud. Ya había importado esta aplicación."
+                  'AVISO',
+                  'Ud. Ya había importado esta aplicación.'
                 );
               }
             }
@@ -429,29 +430,29 @@ export class MyApp {
               collaboratorData.idColour = userColour;
               collaboratorData.isFinalUser = false;
               collaboratorData.isCollaborator = true;
-              loadingUniendose = this.createLoading("Uniéndose...");
+              loadingUniendose = this.createLoading('Uniéndose...');
               loadingUniendose.present();
               this.workspaceService
                 .addMeAsCollaborator(workspaceReference, collaboratorData)
                 .then(
-                  result => {
+                  (result) => {
                     this.hideLoading(loadingUniendose);
                     this.alertText(
-                      "Éxito",
-                      "Se ha unido al workspace correctamente. Ahora puede verlo en el listado de workspaces en los que colabora."
+                      'Éxito',
+                      'Se ha unido al workspace correctamente. Ahora puede verlo en el listado de workspaces en los que colabora.'
                     );
                     this.addWorkspaceAsCollaborator(ws, collaboratorData); //ACTUALIZA LA COLECCION ACTUAL
                   },
-                  error => {
+                  (error) => {
                     console.log(error);
                     this.hideLoading(loadingUniendose);
                     this.alertText(
-                      "Error",
-                      "Hubo un error al unirse al workspace, intente nuevamente."
+                      'Error',
+                      'Hubo un error al unirse al workspace, intente nuevamente.'
                     );
                     const message =
-                      "Hubo un error al unirse, intente nuevamente.";
-                    this.presentToast(message, "top", null);
+                      'Hubo un error al unirse, intente nuevamente.';
+                    this.presentToast(message, 'top', null);
                   }
                 );
             } else {
@@ -463,7 +464,7 @@ export class MyApp {
                 collaboratorData.idColour = collaboratorFound.idColour;
                 collaboratorData.isFinalUser = collaboratorFound.isFinalUser;
                 collaboratorData.isCollaborator = true;
-                loadingUniendose = this.createLoading("Uniéndose...");
+                loadingUniendose = this.createLoading('Uniéndose...');
                 loadingUniendose.present();
                 this.workspaceService
                   .updateFinalUserOrCollaborator(
@@ -471,39 +472,72 @@ export class MyApp {
                     collaboratorData
                   )
                   .then(
-                    response => {
+                    (response) => {
                       this.alertText(
-                        "Éxito",
-                        "Se ha unido al workspace correctamente. Ahora puede verlo en el listado de workspaces en los que colabora."
+                        'Éxito',
+                        'Se ha unido al workspace correctamente. Ahora puede verlo en el listado de workspaces en los que colabora.'
                       );
                       this.addWorkspaceAsFinalUser(ws, collaboratorData); //ACTUALIZA LA COLECCION ACTUAL
                       console.log(response);
                       this.hideLoading(loadingUniendose);
                     },
-                    error => {
+                    (error) => {
                       console.log(error);
                       this.hideLoading(loadingUniendose);
                       this.alertText(
-                        "Error",
-                        "Hubo un error al unirse al workspace, intente nuevamente."
+                        'Error',
+                        'Hubo un error al unirse al workspace, intente nuevamente.'
                       );
                       const message =
-                        "Hubo un error al unirse, intente nuevamente.";
-                      this.presentToast(message, "top", null);
+                        'Hubo un error al unirse, intente nuevamente.';
+                      this.presentToast(message, 'top', null);
                     }
                   );
               } else {
-                this.alertText("AVISO", "Ud. Ya se había unido al workspace");
+                this.alertText('AVISO', 'Ud. Ya se había unido al workspace');
               }
             }
           }
         });
     } else {
       this.alertText(
-        "AVISO",
-        "Ud. Es el creador y no puede unirse a un workspace propio como colaborador o usuario final."
+        'AVISO',
+        'Ud. Es el creador y no puede unirse a un workspace propio como colaborador o usuario final.'
       );
     }
+  }
+
+  foundCollaborator(colFound, type) {
+    let cData;
+    switch (type) {
+      case 'Final': {
+        cData = {
+          idCollaborator: colFound.idCollaborator,
+          idColour: colFound.idColour,
+          isFinalUser: true,
+          isCollaborator: colFound.isCollaborator,
+        };
+      }
+      case 'Collaborator': {
+        cData = {
+          idCollaborator: colFound.idCollaborator,
+          idColour: colFound.idColour,
+          isFinalUser: colFound.isFinalUser,
+          isCollaborator: true,
+        };
+      }
+    }
+    return cData;
+  }
+
+  newCollaborator(
+    idCollaborator: string,
+    idColour: string,
+    isFinalUser: boolean,
+    isCollaborator: boolean
+  ) {
+    let cData = { idCollaborator, idColour, isFinalUser, isCollaborator };
+    return cData;
   }
 
   importWorkspaceFromAnotherUser(workspaceReference) {
@@ -516,16 +550,16 @@ export class MyApp {
     debugger;
     if (!wasMyWorkspace && !workspacePreviouslyImported) {
       debugger;
-      let importingWorkspace = this.createLoading("Uniéndose al workspace...");
+      let importingWorkspace = this.createLoading('Uniéndose al workspace...');
       importingWorkspace.present();
       this.workspaceService
         .importWorkspaceFromAnotherUser(workspaceReference)
         .then(
-          result => {
+          (result) => {
             if (result) {
               let userCollaboratorAndColour = {
                 idCollaborator: this.loggedUser.uid,
-                idColour: userColour
+                idColour: userColour,
               };
               this.addWorkspaceAsCollaborator(
                 result,
@@ -538,36 +572,36 @@ export class MyApp {
                   workspaceReference,
                   userCollaboratorAndColour
                 )
-                .then(result => {
+                .then((result) => {
                   this.alertText(
-                    "Éxito",
-                    "Se ha unido al workspace correctamente. Ahora puede verlo en el listado de workspaces en los que colabora."
+                    'Éxito',
+                    'Se ha unido al workspace correctamente. Ahora puede verlo en el listado de workspaces en los que colabora.'
                   );
                 });
             }
           },
-          error => {
+          (error) => {
             this.hideLoading(importingWorkspace);
             this.alertText(
-              "Error",
-              "Hubo un error al unirse al workspace, intente nuevamente."
+              'Error',
+              'Hubo un error al unirse al workspace, intente nuevamente.'
             );
             const message =
-              "Hubo un error al unirse al workspace, intente nuevamente.";
-            this.presentToast(message, "top", null);
+              'Hubo un error al unirse al workspace, intente nuevamente.';
+            this.presentToast(message, 'top', null);
           }
         );
     } else {
       if (wasMyWorkspace) {
         this.alertText(
-          "AVISO",
-          "No se puede unir como colaborador a un workspace propio."
+          'AVISO',
+          'No se puede unir como colaborador a un workspace propio.'
         );
       } else {
         if (workspacePreviouslyImported) {
           this.alertText(
-            "AVISO",
-            "Ya se había unido a este workspace anteriormente."
+            'AVISO',
+            'Ya se había unido a este workspace anteriormente.'
           );
         }
       }
@@ -582,7 +616,7 @@ export class MyApp {
     } else {
       //SI YA TENIA DATOS LO TENGO QUE CONVERTIR A ITERABLE
       let cols;
-      cols = Object.keys(anExternalWorkspace.collaborators).map(function(
+      cols = Object.keys(anExternalWorkspace.collaborators).map(function (
         index
       ) {
         let col = anExternalWorkspace.collaborators[index];
@@ -601,7 +635,7 @@ export class MyApp {
     } else {
       //SI YA TENIA DATOS LO TENGO QUE CONVERTIR A ITERABLE
       let cols;
-      cols = Object.keys(anExternalWorkspace.collaborators).map(function(
+      cols = Object.keys(anExternalWorkspace.collaborators).map(function (
         index
       ) {
         let col = anExternalWorkspace.collaborators[index];
@@ -617,7 +651,7 @@ export class MyApp {
   buscarWorkspaceEnElListadoYActualizar(obj) {
     if (obj) {
       debugger;
-      let workspaceActualizado = this.myWorkSpacesAsCollaborator.find(function(
+      let workspaceActualizado = this.myWorkSpacesAsCollaborator.find(function (
         ws
       ) {
         return obj.idWorkspace == ws.idWorkspace;
@@ -632,20 +666,20 @@ export class MyApp {
   getWorkspacesFromReferences(references) {
     let allReferences = references.length;
     let referencesOk = 0;
-    references.forEach(ref => {
+    references.forEach((ref) => {
       debugger;
-      this.workspaceService.getWorkspaceFromReference(ref).then(ws => {
+      this.workspaceService.getWorkspaceFromReference(ref).then((ws) => {
         referencesOk = referencesOk + 1;
         /*SUBSCRIBE DE CADA WORKSPACE DE LA LISA */
         this.workspaceService.subscribeToWorkspaceStateChangeForList(ws, this);
         /*SUBSCRIBE DE CADA WORKSPACE DE LA LISTA */
         debugger;
-        let collaborators = Object.keys(ws.collaborators).map(function(index) {
+        let collaborators = Object.keys(ws.collaborators).map(function (index) {
           let col = ws.collaborators[index];
           return col;
         });
         let u = collaborators.find(
-          uc => uc.idCollaborator == this.loggedUser.uid
+          (uc) => uc.idCollaborator == this.loggedUser.uid
         );
         if (u.isCollaborator == true) {
           this.myWorkSpacesAsCollaborator.push(ws);
@@ -658,7 +692,7 @@ export class MyApp {
         if (referencesOk == allReferences) {
           //Si se trajeron todas
           console.log(
-            "SE TRAJERON TODAS LOS WORKSPACES A TRAVES DE LAS REFERENCIAS"
+            'SE TRAJERON TODAS LOS WORKSPACES A TRAVES DE LAS REFERENCIAS'
           );
           console.log(this.myWorkSpacesAsCollaborator);
           this.prepareWorkspacesStatusesAndKind(
@@ -671,8 +705,8 @@ export class MyApp {
     });
   }
 
-  nameUsedInOtherWorkspace(aName) {
-    let wasUsed = this.myWorkspaces.find(function(ws) {
+  nameUsedInOtherWorkspace = (aName) => {
+    let wasUsed = this.myWorkspaces.find(function (ws) {
       return ws.name == aName;
     });
     if (wasUsed == undefined) {
@@ -680,16 +714,18 @@ export class MyApp {
     } else {
       return true;
     }
-  }
+  };
 
-  setWorkspaces(aWorkspacesCollection) {
-    this.prepareWorkspacesStatusesAndKind(aWorkspacesCollection);
+  setWorkspaces = (aWorkspacesCollection) => {
     this.myWorkspaces = aWorkspacesCollection;
-  }
+    this.prepareWorkspacesStatusesAndKind(aWorkspacesCollection);
+    console.log(this.myWorkspaces);
+    console.log(aWorkspacesCollection);
+  };
 
   findBuildingToWorkspace(aBuildingIdentifier) {
     return this.edificios.filter(
-      edif => edif.buildingIdentifier === aBuildingIdentifier
+      (edif) => edif.buildingIdentifier === aBuildingIdentifier
     );
   }
 
@@ -700,38 +736,38 @@ export class MyApp {
       ModalNewWorkspace,
       this.edificios
     ); //Le paso el poi casi completo
-    newWorkspaceModal.onDidDismiss(ws => {
+    newWorkspaceModal.onDidDismiss((ws) => {
       //CUANDO SE CIERRE EL MODAL VUELVE CON DATOS
       let message;
       if (ws) {
         //SI GUARDO ALGO CON LA VENTANA MODAL
         debugger;
         if (!this.nameUsedInOtherWorkspace(ws.name)) {
-          let loadingSavingWS = this.createLoading("Creando workspace...");
+          let loadingSavingWS = this.createLoading('Creando workspace...');
           loadingSavingWS.present();
           ws.idOwner = this.loggedUser.uid; //PONGO EL ID DEL PROPIETARIO
           let buildingToSave = this.findBuildingToWorkspace(
             ws.buildingIdentifier
           ); //BUSCO EL EDIFICIO EN LA COLECCION
           ws.building = buildingToSave; //SETEO EN EL WORKSPACE EL EDIFICIO DE SITUM
-          this.workspaceService.saveWorkspace(ws).then(savedWorkspace => {
+          this.workspaceService.saveWorkspace(ws).then((savedWorkspace) => {
             //GUARDA EL WORKSPACE Y EL EDIFICIO PERO EL EDIFICIO EN OTRA COLECCION (VER EL CODIGO)
             if (savedWorkspace) {
               this.hideLoading(loadingSavingWS);
-              message = "Se ha creado el workspace.";
-              this.presentToast(message, "top", null);
+              message = 'Se ha creado el workspace.';
+              this.presentToast(message, 'top', null);
               this.myWorkspaces.push(ws); //LO AGREGO A LA COLECCIÓN LOCAL, A LA BASE YA LO AGREGUÉ
             } else {
               this.hideLoading(loadingSavingWS);
               message =
-                "Hubo un error al crear el workspace, intente nuevamente.";
-              this.presentToast(message, "top", null);
+                'Hubo un error al crear el workspace, intente nuevamente.';
+              this.presentToast(message, 'top', null);
             }
           });
         } else {
           this.alertText(
-            "ERROR:",
-            "El nombre ya fue utilizado, por favor intente con otro nombre."
+            'ERROR:',
+            'El nombre ya fue utilizado, por favor intente con otro nombre.'
           );
         }
       }
@@ -748,7 +784,7 @@ export class MyApp {
 
   private createLoading(msg) {
     return this.loadingCtrl.create({
-      content: msg
+      content: msg,
     });
   }
 
@@ -757,7 +793,7 @@ export class MyApp {
       message: text,
       duration: 3000,
       position: position,
-      cssClass: toastClass ? toastClass : ""
+      cssClass: toastClass ? toastClass : '',
     });
     toast.present();
   }
@@ -768,20 +804,20 @@ export class MyApp {
 
   setWorkspaceState(newStringStatus) {
     if (newStringStatus) {
-      this.events.publish("workspace:setWorkspaceState", newStringStatus);
+      this.events.publish('workspace:setWorkspaceState', newStringStatus);
     } else {
       console.log(
-        "HUBO UN ERROR AL CAMBIAR EL ESTADO DEL WORKSPACE. Por favor inténtelo nuevamente."
+        'HUBO UN ERROR AL CAMBIAR EL ESTADO DEL WORKSPACE. Por favor inténtelo nuevamente.'
       );
     }
   }
 
   updateWorkspaceState(newStringStatus) {
     if (newStringStatus) {
-      this.events.publish("workspace:updated", newStringStatus);
+      this.events.publish('workspace:updated', newStringStatus);
     } else {
       console.log(
-        "HUBO UN ERROR AL CAMBIAR EL ESTADO DEL WORKSPACE. Por favor inténtelo nuevamente."
+        'HUBO UN ERROR AL CAMBIAR EL ESTADO DEL WORKSPACE. Por favor inténtelo nuevamente.'
       );
     }
   }
@@ -820,20 +856,20 @@ export class MyApp {
       );
       console.log(aWorkspace);
     }
-    let loadWS = this.createLoading("Cargando workspace...");
+    let loadWS = this.createLoading('Cargando workspace...');
     loadWS.present();
     this.buildingsService
       .getBuildingForWorkspace(aWorkspace.buildingIdentifier)
       .then(
-        result => {
+        (result) => {
           aWorkspace.building = result;
           this.hideLoading(loadWS);
-          this.events.publish("workspace:ready", aWorkspace);
+          this.events.publish('workspace:ready', aWorkspace);
         },
-        error => {
+        (error) => {
           const message =
-            "Hubo un error al cargar el workspace, intente nuevamente.";
-          this.presentToast(message, "top", null);
+            'Hubo un error al cargar el workspace, intente nuevamente.';
+          this.presentToast(message, 'top', null);
           this.hideLoading(loadWS);
         }
       );
@@ -843,26 +879,26 @@ export class MyApp {
     let alert = this.alertCtrl.create({
       title: aTitle,
       subTitle: aSubTitle,
-      buttons: ["Cerrar"]
+      buttons: ['Cerrar'],
     });
     alert.present();
   }
 
   scanToImportWorkspace() {
-    this.events.publish("scanToImportWorkspace");
+    this.events.publish('scanToImportWorkspace');
   }
   openModalFinalApps() {
     let parameters;
     parameters = {
       workspaces: this.myWorkSpacesAsFinalUser,
       theyAreMyWorkspaces: true,
-      loggedUser: this.loggedUser
+      loggedUser: this.loggedUser,
     };
     let workspacesListModal = this.modalCtrl.create(
       ModalWorkspacesList,
       parameters
     ); //Le paso la lista de workspaces
-    workspacesListModal.onDidDismiss(ws => {
+    workspacesListModal.onDidDismiss((ws) => {
       //CUANDO SE CIERRE EL MODAL VUELVE CON DATOS
       debugger;
       if (ws != undefined) {
@@ -885,25 +921,25 @@ export class MyApp {
 
   openModal(tipoWorkspaces) {
     let parameters;
-    if (tipoWorkspaces == "misWorkspaces") {
+    if (tipoWorkspaces == 'misWorkspaces') {
       parameters = {
         workspaces: this.myWorkspaces,
-        tipoWorkspaces: "misWorkspaces",
-        loggedUser: this.loggedUser
+        tipoWorkspaces: 'misWorkspaces',
+        loggedUser: this.loggedUser,
       }; //MIS WORKSPACES
     } else {
-      if (tipoWorkspaces == "workspacesDondeColaboro") {
+      if (tipoWorkspaces == 'workspacesDondeColaboro') {
         parameters = {
           workspaces: this.myWorkSpacesAsCollaborator,
-          tipoWorkspaces: "workspacesDondeColaboro",
-          loggedUser: this.loggedUser
+          tipoWorkspaces: 'workspacesDondeColaboro',
+          loggedUser: this.loggedUser,
         }; //MIS WORKSPACES
       } else {
-        if (tipoWorkspaces == "aplicacionesFinales") {
+        if (tipoWorkspaces == 'aplicacionesFinales') {
           parameters = {
             workspaces: this.myWorkSpacesAsFinalUser,
-            tipoWorkspaces: "aplicacionesFinales",
-            loggedUser: this.loggedUser
+            tipoWorkspaces: 'aplicacionesFinales',
+            loggedUser: this.loggedUser,
           }; //MIS WORKSPACES
         }
       }
@@ -913,7 +949,7 @@ export class MyApp {
       ModalWorkspacesList,
       parameters
     ); //Le paso la lista de workspaces
-    workspacesListModal.onDidDismiss(ws => {
+    workspacesListModal.onDidDismiss((ws) => {
       //CUANDO SE CIERRE EL MODAL VUELVE CON DATOS
       debugger;
       if (ws != undefined) {
@@ -925,10 +961,10 @@ export class MyApp {
 
   killApp() {
     //LLAMA A UN EVENTO DEL POSITIONING
-    this.events.publish("killApp");
+    this.events.publish('killApp');
   }
   minimizeApp() {
     this.connectSubscription.unsubscribe(); //CHEQUEAR
-    this.events.publish("minimizeApp");
+    this.events.publish('minimizeApp');
   }
 }

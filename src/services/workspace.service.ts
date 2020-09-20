@@ -1,7 +1,8 @@
-import { Injectable } from "@angular/core";
-import { AngularFireDatabase } from "angularfire2/database";
-import { Building, BuildingsService } from "../services/buildings.service";
-import { Subscription } from "rxjs";
+import { Injectable } from '@angular/core';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { Building, BuildingsService } from '../services/buildings.service';
+import { SensingMechanism } from '../services/positioning.service';
+import { Subscription } from 'rxjs';
 
 export interface WorkspaceStatus {
   idStatus: string;
@@ -22,10 +23,11 @@ export class ConcreteStatus {
   }
 }
 
-export class EdicionDelCreador extends ConcreteStatus
+export class EdicionDelCreador
+  extends ConcreteStatus
   implements WorkspaceStatus {
   constructor() {
-    super("EdicionDelCreador");
+    super('EdicionDelCreador');
   }
   public deletePoi(caller, isOwner, aPoi) {
     if (isOwner) {
@@ -60,10 +62,11 @@ export class EdicionDelCreador extends ConcreteStatus
   }
 }
 
-export class EdicionColaborativa extends ConcreteStatus
+export class EdicionColaborativa
+  extends ConcreteStatus
   implements WorkspaceStatus {
   constructor() {
-    super("EdicionColaborativa");
+    super('EdicionColaborativa');
   }
   public deletePoi(caller, isOwner, aPoi) {
     caller.deleteFromFirebase(aPoi);
@@ -82,10 +85,11 @@ export class EdicionColaborativa extends ConcreteStatus
   }
 }
 
-export class EdicionDelCreadorVersionFinal extends ConcreteStatus
+export class EdicionDelCreadorVersionFinal
+  extends ConcreteStatus
   implements WorkspaceStatus {
   constructor() {
-    super("EdicionDelCreadorVersionFinal");
+    super('EdicionDelCreadorVersionFinal');
   }
   public deletePoi(caller, isOwner, aPoi) {
     if (isOwner) {
@@ -116,10 +120,11 @@ export class EdicionDelCreadorVersionFinal extends ConcreteStatus
   }
 }
 
-export class VersionFinalPublica extends ConcreteStatus
+export class VersionFinalPublica
+  extends ConcreteStatus
   implements WorkspaceStatus {
   constructor() {
-    super("VersionFinalPublica");
+    super('VersionFinalPublica');
   }
   public deletePoi(caller, isOwner, aPoi) {
     caller.cantDelete();
@@ -151,20 +156,21 @@ export class Kind {
 
 export class RecorridoLineal extends Kind implements KindInterface {
   constructor() {
-    super("RecorridoLineal");
+    super('RecorridoLineal');
   }
 }
 
 export class CrearLugaresRelevantes extends Kind implements KindInterface {
   constructor() {
-    super("CrearLugaresRelevantes");
+    super('CrearLugaresRelevantes');
   }
 }
 
-export class CrearLugaresRelevantesConPreguntas extends Kind
+export class CrearLugaresRelevantesConPreguntas
+  extends Kind
   implements KindInterface {
   constructor() {
-    super("CrearLugaresRelevantesConPreguntas");
+    super('CrearLugaresRelevantesConPreguntas');
   }
 }
 
@@ -178,6 +184,7 @@ export class Workspace {
   building: Building;
   status: WorkspaceStatus;
   kind: Kind;
+  positioning: SensingMechanism;
   strategyToShowPoIWLAN?: StrategyToShowMarker;
   strategyToShowPoIQR?: StrategyToShowMarker;
   strategyToShowInformationPoIWLAN?: StrategyToShowInformation;
@@ -203,19 +210,19 @@ export class StrategyToShowMarker {
 }
 export class MostrarMarcadorSiempre extends StrategyToShowMarker {
   constructor() {
-    super("MostrarMarcadorSiempre");
+    super('MostrarMarcadorSiempre');
   }
 }
 
 export class MostrarMarcadorPorProximidad extends StrategyToShowMarker {
   constructor() {
-    super("MostrarMarcadorPorProximidad");
+    super('MostrarMarcadorPorProximidad');
   }
 }
 
 export class MostrarMarcadorPorEscaneo extends StrategyToShowMarker {
   constructor() {
-    super("MostrarMarcadorPorEscaneo");
+    super('MostrarMarcadorPorEscaneo');
   }
 }
 
@@ -233,7 +240,7 @@ export class MostrarInformacionSiempreQueEstePosicionadoEnElEdificio
   extends StrategyToShowInformation
   implements StrategyToShowInformation {
   constructor() {
-    super("MostrarInformacionSiempreQueEstePosicionadoEnElEdificio");
+    super('MostrarInformacionSiempreQueEstePosicionadoEnElEdificio');
   }
   public verDatosPoi(aPoi, paginaInvocante) {
     paginaInvocante.abrirPoi(aPoi.poiName);
@@ -242,14 +249,14 @@ export class MostrarInformacionSiempreQueEstePosicionadoEnElEdificio
 
 export class MostrarInformacionPorProximidad extends StrategyToShowInformation {
   constructor() {
-    super("MostrarInformacionPorProximidad");
+    super('MostrarInformacionPorProximidad');
   }
   /*Realizar la implementación*/
 }
 
 export class MostrarInformacionPorEscaneo extends StrategyToShowInformation {
   constructor() {
-    super("MostrarInformacionPorEscaneo");
+    super('MostrarInformacionPorEscaneo');
   }
   public verDatosPoi(aPoi, paginaInvocante) {
     paginaInvocante.noAbrirPoi(aPoi.poiName);
@@ -266,44 +273,60 @@ export class WorkspaceService {
   myWorkspaces: any[];
   private subscriptionStatusChange: Subscription;
   private subscriptionStatusChangeFromModal: Subscription;
-  tabla = "workspaces/";
+  tabla = 'workspaces/';
   constructor(
     public angularfirebaseDB: AngularFireDatabase,
     private buildingService: BuildingsService
   ) {}
 
+  public deleteWorkspaces(workspace) {
+    return new Promise<boolean>((result) => {
+      this.angularfirebaseDB.database
+        .ref('workspaces/' + workspace.idOwner)
+        .set(null)
+        .then(
+          (resolve) => {
+            result(true);
+          },
+          (reject) => {
+            result(false);
+          }
+        );
+    });
+  }
+
   public getWorkspaceFromReference(workspaceReference) {
-    return new Promise<Workspace>(result => {
+    return new Promise<Workspace>((result) => {
       debugger; //VALOR DEL OBJETO
       var ref = this.angularfirebaseDB.database.ref(
-        "workspaces/" +
+        'workspaces/' +
           workspaceReference.idOwner +
-          "/" +
+          '/' +
           workspaceReference.idWorkspace
       );
-      ref.once("value").then(function(snapshot) {
+      ref.once('value').then(function (snapshot) {
         result(snapshot.val());
       });
     });
   }
 
   public getWorkspacesReferences(idCollaborator) {
-    return new Promise<Object[]>(result => {
+    return new Promise<Object[]>((result) => {
       this.angularfirebaseDB
-        .list("workspacesReferences/" + idCollaborator)
+        .list('workspacesReferences/' + idCollaborator)
         .valueChanges()
-        .subscribe(references => {
+        .subscribe((references) => {
           result(references);
         });
     });
   }
 
   public importWorkspaceFromAnotherUser(workspaceRef) {
-    return new Promise<Workspace>(resPromesa => {
+    return new Promise<Workspace>((resPromesa) => {
       var workspaceReference = this.angularfirebaseDB.database.ref(
-        this.tabla + workspaceRef.idOwner + "/" + workspaceRef.idWorkspace
+        this.tabla + workspaceRef.idOwner + '/' + workspaceRef.idWorkspace
       );
-      workspaceReference.once("value").then(function(snapshot) {
+      workspaceReference.once('value').then(function (snapshot) {
         debugger;
         resPromesa(snapshot.val());
       });
@@ -311,18 +334,18 @@ export class WorkspaceService {
   }
 
   public getWorkspaces(anIdUser) {
-    return new Promise<Workspace[]>(resPromesa => {
+    return new Promise<Workspace[]>((resPromesa) => {
       this.angularfirebaseDB
         .list(this.tabla + anIdUser)
         .valueChanges()
         .subscribe(
-          ownWorkspaces => {
+          (ownWorkspaces) => {
             this.myWorkspaces = ownWorkspaces;
             resPromesa(this.myWorkspaces);
           },
-          error => {
+          (error) => {
             const errorMsg =
-              "Un error ha ocurrido mientras se recuperaban los workspaces";
+              'Un error ha ocurrido mientras se recuperaban los workspaces';
             console.log(`${errorMsg}`, error);
           }
         );
@@ -330,13 +353,13 @@ export class WorkspaceService {
   }
 
   saveABuilding(aBuilding) {
-    return new Promise<boolean>(resPromesa => {
+    return new Promise<boolean>((resPromesa) => {
       this.buildingService.saveBuilding(aBuilding).then(
-        resolve => {
+        (resolve) => {
           debugger;
           resPromesa(true);
         },
-        reject => {
+        (reject) => {
           debugger;
           resPromesa(false);
         }
@@ -345,21 +368,21 @@ export class WorkspaceService {
   }
 
   public saveWorkspace(aWorkspace) {
-    return new Promise<boolean>(resPromesa => {
+    return new Promise<boolean>((resPromesa) => {
       debugger;
       let building = aWorkspace.building[0];
       aWorkspace.building = null;
       this.angularfirebaseDB.database
         .ref(
-          this.tabla + "/" + aWorkspace.idOwner + "/" + aWorkspace.idWorkspace
+          this.tabla + '/' + aWorkspace.idOwner + '/' + aWorkspace.idWorkspace
         )
         .set(aWorkspace)
         .then(
-          resolve => {
+          (resolve) => {
             debugger;
             resPromesa(this.saveABuilding(building));
           },
-          reject => {
+          (reject) => {
             debugger;
             resPromesa(false);
           }
@@ -371,28 +394,28 @@ export class WorkspaceService {
     if (this.subscriptionStatusChangeFromModal) {
       this.subscriptionStatusChangeFromModal.unsubscribe();
     }
-    return new Promise<Object>(resPromesa => {
+    return new Promise<Object>((resPromesa) => {
       //EL LISTENER DE FIREBASE EJECUTA DESDE EL SUBSCRIBE
       this.subscriptionStatusChangeFromModal = this.angularfirebaseDB
         .list(
-          "workspaces/" +
+          'workspaces/' +
             aWorkspace.idOwner +
-            "/" +
+            '/' +
             aWorkspace.idWorkspace +
-            "/status/"
+            '/status/'
         )
         .valueChanges()
         .subscribe(
-          response => {
+          (response) => {
             debugger;
             //resPromesa(response[0]);
             aPage.updateWorkspaceState(response[0]);
           },
-          error => {
+          (error) => {
             //resPromesa(undefined);
             aPage.updateWorkspaceState(undefined);
             const errorMsg =
-              "Un error ha ocurrido al cambiar el estado del workspace.";
+              'Un error ha ocurrido al cambiar el estado del workspace.';
             console.log(`${errorMsg}`, error);
           }
         );
@@ -401,30 +424,30 @@ export class WorkspaceService {
 
   /*ESTO ES PARA EL LISTADO DE LOS WORKSPACES QUE NO SON MIOS*/
   public subscribeToWorkspaceStateChangeForList(aWorkspace, appComponents) {
-    return new Promise<Params>(resPromesa => {
+    return new Promise<Params>((resPromesa) => {
       //EL LISTENER DE FIREBASE EJECUTA DESDE EL SUBSCRIBE
 
       this.subscriptionStatusChange = this.angularfirebaseDB
         .list(
-          "workspaces/" +
+          'workspaces/' +
             aWorkspace.idOwner +
-            "/" +
+            '/' +
             aWorkspace.idWorkspace +
-            "/status/"
+            '/status/'
         )
         .valueChanges()
         .subscribe(
-          response => {
+          (response) => {
             debugger;
             let params = new Params();
             params.idWorkspace = aWorkspace.idWorkspace.toString();
             params.idStatus = response[0].toString();
             appComponents.buscarWorkspaceEnElListadoYActualizar(params);
           },
-          error => {
+          (error) => {
             appComponents.buscarWorkspaceEnElListadoYActualizar(undefined);
             const errorMsg =
-              "Un error ha ocurrido al cambiar el estado del workspace.";
+              'Un error ha ocurrido al cambiar el estado del workspace.';
             console.log(`${errorMsg}`, error);
           }
         );
@@ -437,20 +460,20 @@ export class WorkspaceService {
       //AL ABRIR UN WORKSPACE
       this.subscriptionStatusChange.unsubscribe();
     }
-    return new Promise<String>(resPromesa => {
+    return new Promise<String>((resPromesa) => {
       //EL LISTENER DE FIREBASE EJECUTA DESDE EL SUBSCRIBE
       let workspaceAbiertoPrimeraVez = true;
       this.subscriptionStatusChange = this.angularfirebaseDB
         .list(
-          "workspaces/" +
+          'workspaces/' +
             aWorkspace.idOwner +
-            "/" +
+            '/' +
             aWorkspace.idWorkspace +
-            "/status/"
+            '/status/'
         )
         .valueChanges()
         .subscribe(
-          response => {
+          (response) => {
             debugger;
             if (workspaceAbiertoPrimeraVez) {
               workspaceAbiertoPrimeraVez = false;
@@ -459,10 +482,10 @@ export class WorkspaceService {
               appComponents.updateWorkspaceState(response[0]);
             }
           },
-          error => {
+          (error) => {
             appComponents.updateWorkspaceState(undefined);
             const errorMsg =
-              "Un error ha ocurrido al cambiar el estado del workspace.";
+              'Un error ha ocurrido al cambiar el estado del workspace.';
             console.log(`${errorMsg}`, error);
           }
         );
@@ -470,31 +493,46 @@ export class WorkspaceService {
   }
 
   public updateWorkspaceState(aWorkspace, newStatus) {
-    return new Promise<boolean>(resPromesa => {
+    return new Promise<boolean>((resPromesa) => {
       debugger;
       aWorkspace.building = null;
       this.angularfirebaseDB.database
         .ref(
           this.tabla +
-            "/" +
+            '/' +
             aWorkspace.idOwner +
-            "/" +
+            '/' +
             aWorkspace.idWorkspace +
-            "/status/"
+            '/status/'
         )
         .set(newStatus)
         .then(
-          resolve => {
+          (resolve) => {
             debugger;
             resPromesa(true);
           },
-          reject => {
+          (reject) => {
             debugger;
             resPromesa(false);
           }
         );
     });
   }
+
+  /*public updateWorkspacePositioning(aWorkspace, newPos) {
+        return new Promise<boolean>((resPromesa) => {
+            debugger;
+            aWorkspace.building = null;
+            this.angularfirebaseDB.database.ref(this.tabla + '/' + aWorkspace.idOwner + '/' + aWorkspace.idWorkspace + '/positioning/').set(newPos).then(
+                resolve => {
+                    debugger;
+                    resPromesa(true);
+                }, reject => {
+                    debugger;
+                    resPromesa(false);
+                });
+        });
+    }*/
 
   public defineWorkspaceStrategiesAndUpdateState(
     aWorkspace,
@@ -512,6 +550,7 @@ export class WorkspaceService {
     editedWorkspace.kind = aWorkspace.kind;
     editedWorkspace.name = aWorkspace.name;
     editedWorkspace.status = aWorkspace.status;
+    editedWorkspace.positioning = aWorkspace.positioning;
     editedWorkspace.strategyToShowPoIWLAN =
       strategies.estrategiaSeleccionadaParaMostrarPOIWLAN; //AGREGO ESTRATEGIA PARA MOSTRAR POI SIN QR
     editedWorkspace.strategyToShowPoIQR =
@@ -521,15 +560,15 @@ export class WorkspaceService {
     editedWorkspace.strategyToShowInformationPoIQR =
       strategies.estrategiaSeleccionadaParaMostrarInformacionPOIQR; //AGREGO ESTRATEGIA PARA MOSTRAR INFORMACION CON QR
 
-    return new Promise<boolean>(resultadoPromesa => {
+    return new Promise<boolean>((resultadoPromesa) => {
       this.angularfirebaseDB.database
         .ref(
           this.tabla +
-            "/" +
+            '/' +
             aWorkspace.idOwner +
-            "/" +
+            '/' +
             aWorkspace.idWorkspace +
-            "/"
+            '/'
         )
         .update({
           status: VersionFinalPublica,
@@ -540,14 +579,14 @@ export class WorkspaceService {
           strategyToShowInformationPoIWLAN:
             strategies.estrategiaSeleccionadaParaMostrarInformacionPOIWLAN,
           strategyToShowInformationPoIQR:
-            strategies.estrategiaSeleccionadaParaMostrarInformacionPOIQR
+            strategies.estrategiaSeleccionadaParaMostrarInformacionPOIQR,
         })
         .then(
-          resolve => {
+          (resolve) => {
             debugger;
             resultadoPromesa(true);
           },
-          reject => {
+          (reject) => {
             debugger;
             resultadoPromesa(false);
           }
@@ -557,98 +596,98 @@ export class WorkspaceService {
 
   public addMeAsCollaborator(wsRef, userData) {
     //AGREGO EL COLABORADOR AL WORKSPACE AL QUE ACABA DE ESCANEAR ROLLBACKS?
-    return new Promise<boolean>(result => {
+    return new Promise<boolean>((result) => {
       //
       this.angularfirebaseDB.database
         .ref(
           this.tabla +
-            "/" +
+            '/' +
             wsRef.idOwner +
-            "/" +
+            '/' +
             wsRef.idWorkspace +
-            "/collaborators/" +
+            '/collaborators/' +
             userData.idCollaborator +
-            "/"
+            '/'
         )
         .set(userData)
         .then(
-          resolve => {
+          (resolve) => {
             this.angularfirebaseDB.database
-              .ref("workspacesReferences/" + userData.idCollaborator + "/")
+              .ref('workspacesReferences/' + userData.idCollaborator + '/')
               .push(wsRef)
               .then(
-                res => {
+                (res) => {
                   result(true);
                 },
-                rej => {
+                (rej) => {
                   result(false);
                 }
               );
           },
-          reject => {
+          (reject) => {
             result(false);
           }
         );
     });
   }
   public addMeAsFinalUser(wsRef, userData) {
-    return new Promise<boolean>(result => {
+    return new Promise<boolean>((result) => {
       //
       this.angularfirebaseDB.database
         .ref(
           this.tabla +
-            "/" +
+            '/' +
             wsRef.idOwner +
-            "/" +
+            '/' +
             wsRef.idWorkspace +
-            "/collaborators/" +
+            '/collaborators/' +
             userData.idCollaborator +
-            "/"
+            '/'
         )
         .set(userData)
         .then(
-          resolve => {
+          (resolve) => {
             this.angularfirebaseDB.database
-              .ref("workspacesReferences/" + userData.idCollaborator + "/")
+              .ref('workspacesReferences/' + userData.idCollaborator + '/')
               .push(wsRef)
               .then(
-                res => {
+                (res) => {
                   result(true);
                 },
-                rej => {
+                (rej) => {
                   result(false);
                 }
               );
           },
-          reject => {
+          (reject) => {
             result(false);
           }
         );
     });
   }
   public updateFinalUserOrCollaborator(wsRef, userData) {
-    return new Promise<boolean>(resPromesa => {
+    return new Promise<boolean>((resPromesa) => {
       debugger;
       this.angularfirebaseDB.database
         .ref(
           this.tabla +
-            "/" +
+            '/' +
             wsRef.idOwner +
-            "/" +
+            '/' +
             wsRef.idWorkspace +
-            "/collaborators/" +
+            '/collaborators/' +
             userData.idCollaborator +
-            "/"
+            '/'
         )
         .update({
           isCollaborator: userData.isCollaborator,
-          isFinalUser: userData.isFinalUser
+          isFinalUser: userData.isFinalUser,
         })
         .then(
-          resolve => {
+          (resolve) => {
             resPromesa(true);
           },
-          reject => {
+          (reject) => {
             debugger;
             resPromesa(false);
           }
@@ -659,13 +698,13 @@ export class WorkspaceService {
   public getStrategyToShowInformation(aStringStrategyToShowInformation) {
     debugger;
     switch (aStringStrategyToShowInformation) {
-      case "MostrarInformacionSiempreQueEstePosicionadoEnElEdificio": {
+      case 'MostrarInformacionSiempreQueEstePosicionadoEnElEdificio': {
         return new MostrarInformacionSiempreQueEstePosicionadoEnElEdificio();
       }
-      case "MostrarInformacionPorProximidad": {
+      case 'MostrarInformacionPorProximidad': {
         return new MostrarInformacionPorProximidad();
       }
-      case "MostrarInformacionPorEscaneo": {
+      case 'MostrarInformacionPorEscaneo': {
         return new MostrarInformacionPorEscaneo();
       }
     }
@@ -673,13 +712,13 @@ export class WorkspaceService {
 
   public getStrategyToShowMarker(aStringStrategyToShowMarker) {
     switch (aStringStrategyToShowMarker) {
-      case "MostrarMarcadorSiempre": {
+      case 'MostrarMarcadorSiempre': {
         return new MostrarMarcadorSiempre();
       }
-      case "MostrarMarcadorPorProximidad": {
+      case 'MostrarMarcadorPorProximidad': {
         return new MostrarMarcadorPorProximidad();
       }
-      case "MostrarMarcadorPorEscaneo": {
+      case 'MostrarMarcadorPorEscaneo': {
         return new MostrarMarcadorPorEscaneo();
       }
     }

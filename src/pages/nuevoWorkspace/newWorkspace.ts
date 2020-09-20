@@ -1,28 +1,32 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild } from '@angular/core';
 import {
   Platform,
   NavParams,
   ViewController,
   AlertController,
-  Slides
-} from "ionic-angular";
+  Slides,
+} from 'ionic-angular';
 import {
   Workspace,
   EdicionDelCreador,
   RecorridoLineal,
   CrearLugaresRelevantes,
-  CrearLugaresRelevantesConPreguntas
-} from "../../services/workspace.service";
+  CrearLugaresRelevantesConPreguntas,
+} from '../../services/workspace.service';
+
+import { Situm, Fixed } from '../../services/positioning.service';
+
 @Component({
-  selector: "page-newWorkspace",
-  templateUrl: "modalNewWorkspace.html"
+  selector: 'page-newWorkspace',
+  templateUrl: 'modalNewWorkspace.html',
 })
 export class ModalNewWorkspace {
   @ViewChild(Slides) slides: Slides;
   private indexColour;
   private coloursList;
   public edificaciones;
-  private kindOfWorkspace: any;
+  public kindOfWorkspace: any;
+  public positioning: any;
 
   newWorkspace: Workspace;
   constructor(
@@ -39,46 +43,59 @@ export class ModalNewWorkspace {
     this.newWorkspace.status = new EdicionDelCreador();
 
     this.coloursList = [
-      "#2E7D32",
-      "#7B1FA2",
-      "#283593",
-      "#F44336",
-      "#66BB6A",
-      "#F06292",
-      "#304FFE",
-      "#1576C9",
-      "#860000",
-      "#424250",
-      "#FF7043",
-      "#000000",
-      "#9E9E9E",
-      "#FF6D00",
-      "#E040FB"
+      '#2E7D32',
+      '#7B1FA2',
+      '#283593',
+      '#F44336',
+      '#66BB6A',
+      '#F06292',
+      '#304FFE',
+      '#1576C9',
+      '#860000',
+      '#424250',
+      '#FF7043',
+      '#000000',
+      '#9E9E9E',
+      '#FF6D00',
+      '#E040FB',
     ];
   }
 
-  private acceptAddWorkspace() {
-    this.kindOfWorkspace = this.kindOfWorkspace || "CrearLugaresRelevantes";
+  public acceptAddWorkspace() {
+    this.kindOfWorkspace = this.kindOfWorkspace || 'CrearLugaresRelevantes';
     this.newWorkspace.kind = this.getKind(this.kindOfWorkspace);
+    this.newWorkspace.positioning = this.getPositioning(this.positioning);
     this.viewCtrl.dismiss(this.newWorkspace);
   }
 
   private getKind(aStringKindClass) {
     //DEBERÍA SER POR REFLECTION
     switch (aStringKindClass) {
-      case "CrearLugaresRelevantes": {
+      case 'CrearLugaresRelevantes': {
         return new CrearLugaresRelevantes();
       }
-      case "CrearLugaresRelevantesConPreguntas": {
+      case 'CrearLugaresRelevantesConPreguntas': {
         return new CrearLugaresRelevantesConPreguntas();
       }
-      case "RecorridoLineal": {
+      case 'RecorridoLineal': {
         return new RecorridoLineal();
       }
     }
   }
 
-  private slideChanged() {
+  public getPositioning(aStringPositioningClass) {
+    //DEBERÍA SER POR REFLECTION
+    switch (aStringPositioningClass) {
+      case 'Situm': {
+        return new Situm();
+      }
+      case 'Fixed': {
+        return new Fixed();
+      }
+    }
+  }
+
+  public slideChanged() {
     this.indexColour = this.slides.getActiveIndex();
     //this.alertText("id del slide: ", this.coloursList[this.indexColour]);
     this.newWorkspace.applicationColour = this.coloursList[this.indexColour];
@@ -89,23 +106,28 @@ export class ModalNewWorkspace {
   }
 
   private isValidName() {
-    return this.newWorkspace.name != "" && this.newWorkspace.name != undefined;
+    return this.newWorkspace.name != '' && this.newWorkspace.name != undefined;
   }
   private buildingSelected() {
     return (
-      this.newWorkspace.buildingIdentifier != "" &&
+      this.newWorkspace.buildingIdentifier != '' &&
       this.newWorkspace.buildingIdentifier != undefined
     );
   }
   private kindOfWorkspaceSelected() {
-    return this.kindOfWorkspace != "" && this.kindOfWorkspace != undefined;
+    return this.kindOfWorkspace != '' && this.kindOfWorkspace != undefined;
   }
 
-  private isComplete() {
+  public positioningSelected() {
+    return this.positioning != '' && this.positioning != undefined;
+  }
+
+  public isComplete() {
     return (
       this.isValidName() &&
       this.buildingSelected() &&
-      this.kindOfWorkspaceSelected()
+      this.kindOfWorkspaceSelected() &&
+      this.positioningSelected()
     );
   }
 
@@ -113,7 +135,7 @@ export class ModalNewWorkspace {
     let alert = this.alertCtrl.create({
       title: aTitle,
       subTitle: aSubTitle,
-      buttons: ["Cerrar"]
+      buttons: ['Cerrar'],
     });
     alert.present();
   }

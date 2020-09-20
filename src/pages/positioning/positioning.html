@@ -8,15 +8,15 @@
     <button ion-button menuToggle icon-only>
       <ion-icon color="changeableColour" name="menu"></ion-icon>
     </button>
-    <ion-title *ngIf="isFinalMode" color="white">{{
-      currentWorkspace.name
-    }}</ion-title>
+    <ion-title *ngIf="isFinalMode" color="white"
+      >{{ currentWorkspace.name }}</ion-title
+    >
     <ion-title *ngIf="!isFinalMode" color="white">Authoring Tool</ion-title>
     <ion-buttons end>
       <ion-label
-        style="width:30% !important"
+        style="width: 30% !important"
         *ngIf="nameUserLogged"
-        style="text-align:right; padding-bottom:14px"
+        style="text-align: right; padding-bottom: 14px"
         color="light"
         stacked
         >{{ nameUserLogged }}</ion-label
@@ -48,8 +48,14 @@
 <ion-content>
   <div
     *ngIf="!mapLoaded"
-    style="width: 100%; height:70vh; background-image: url('assets/img/backgroundLoggedUserFinal.png') !important;
-  background-size: 100% !important; background-repeat: no-repeat !important; background-position: center !important;"
+    style="
+      width: 100%;
+      height: 70vh;
+      background-image: url('assets/img/backgroundLoggedUserFinal.png') !important;
+      background-size: 100% !important;
+      background-repeat: no-repeat !important;
+      background-position: center !important;
+    "
   ></div>
 
   <!-- <ion-grid>
@@ -130,9 +136,13 @@
   <img style="width: 50px; height: 50px;" [src]="modelQRPoi"/> -->
   <ion-row class="map">
     <ion-col class="map">
-      <ion-fab style="width: 90px;" right bottom #fab>
+      <ion-fab style="width: 90px" right bottom #fab>
         <button
-          style="background-color: transparent; box-shadow: none; transition:inherit"
+          style="
+            background-color: transparent;
+            box-shadow: none;
+            transition: inherit;
+          "
           ion-fab
           color="danger"
           (click)="preventClick()"
@@ -143,7 +153,7 @@
         <button
           ion-fab
           color="white"
-          style="text-align: center; font-weight: 700;"
+          style="text-align: center; font-weight: 700"
         >
           {{ time }} s
         </button></ion-fab
@@ -167,7 +177,7 @@
               (click)="checkGPSEnabled()"
             >
               <img
-                style="width: 44px; height: 44px;"
+                style="width: 44px; height: 44px"
                 src="assets/img/playLocateInversePrimary.png"
               />
             </button>
@@ -179,13 +189,13 @@
               (click)="stopPositioning()"
             >
               <img
-                style="width: 44px; height: 44px;"
+                style="width: 44px; height: 44px"
                 src="assets/img/stopLocateInverseDanger.png"
               />
             </button>
           </ion-col>
         </ion-row>
-        <ion-row style="padding-top:2vh;">
+        <ion-row style="padding-top: 2vh">
           <ion-col>
             <button
               color="white"
@@ -204,11 +214,17 @@
               <!-- this.icon = "assets/img/"+"pinPoiQR"+this.colorString+".png"; -->
               <!-- <img style="width: 44px; height: 44px;" src={{icon}}> -->
               <img
-                style="width: 44px; height: 44px; position:fixed;"
+                style="width: 44px; height: 44px; position: fixed"
                 src="{{ iconAddUserColour }}"
               />
               <ion-icon
-                style="z-index: 999;padding-top: 16px;padding-left: 28px;font-weight: bold;font-size: 28px;"
+                style="
+                  z-index: 999;
+                  padding-top: 16px;
+                  padding-left: 28px;
+                  font-weight: bold;
+                  font-size: 28px;
+                "
                 ios="ios-add"
                 md="md-add"
               ></ion-icon>
@@ -237,10 +253,7 @@
               color="tertiary"
               style="text-align: center"
             >
-              <img
-                style="width: 35px; height: 35px;"
-                src="assets/img/cup.png"
-              />
+              <img style="width: 35px; height: 35px" src="assets/img/cup.png" />
             </button>
           </ion-col>
         </ion-row>
@@ -258,7 +271,7 @@
           <ion-item
             *ngIf="isCurrentWorkspaceOwner"
             text-wrap
-            style="border-bottom: 1px solid #dedede; min-width: 69vw;"
+            style="border-bottom: 1px solid #dedede; min-width: 69vw"
             class="fondoBlanco"
           >
             <ion-label style="color: black">
@@ -289,11 +302,24 @@
               </ion-option>
             </ion-select>
           </ion-item>
+          <!--<ion-item *ngIf="isCurrentWorkspaceOwner" text-wrap style="border-bottom: 1px solid #dedede; min-width: 69vw;"
+            class="fondoBlanco">
+            <ion-label style="color: black">
+              <b>Posicionamiento:</b>
+            </ion-label>
+            <ion-select class="selectPiso anchoTotal fondoBlanco alturaBotonFlotante" [(ngModel)]="currentWorkspace.positioning.idPositioning"
+              (ionChange)="changeWorkspacePositioning($event, fab)">
+              <ion-option text-wrap *ngFor="let pos of possiblesPositioningStrings" value="{{pos}}">
+                <div *ngIf='pos == "Situm"'>Situm</div>
+                <div *ngIf='pos == "Fixed"'>Fijo</div>
+              </ion-option>
+            </ion-select>
+          </ion-item> -->
           <button
-            style="border-bottom: 1px solid #dedede;"
+            style="border-bottom: 1px solid #dedede"
             *ngIf="isCurrentWorkspaceOwner"
             ion-item
-            (click)="closeFab(fab); shareViaQR()"
+            (click)="closeFab(fab);shareViaQR()"
           >
             <ion-icon
               color="dark"
@@ -304,7 +330,7 @@
             Compartir workspace via QR
           </button>
           <ion-item
-            style="border-bottom: 1px solid #dedede; min-width: 69vw;"
+            style="border-bottom: 1px solid #dedede; min-width: 69vw"
             class="fondoBlanco"
           >
             <ion-label style="color: black"><b>Piso:</b></ion-label>
@@ -324,7 +350,7 @@
             </ion-select>
           </ion-item>
           <button
-            style="border-bottom: 1px solid #dedede;"
+            style="border-bottom: 1px solid #dedede"
             *ngIf="isCurrentWorkspaceOwner && !isFinalMode"
             ion-item
             (click)="closeFab(fab); openPoisFilter()"
@@ -338,7 +364,7 @@
           </button>-->
           <button
             *ngIf="currentWorkspace.status.idStatus == 'VersionFinalPublica'"
-            style="border-bottom: 1px solid #dedede;"
+            style="border-bottom: 1px solid #dedede"
             class="alturaBotonFlotante"
             ion-item
             (click)="closeFab(fab); iniciarQRScannerToPoi()"
@@ -355,7 +381,7 @@
             <ion-toggle disabled="{{!isCurrentWorkspaceOwner}}" color="myBlueColour" [(ngModel)]="isFinal" (ionChange)="changeVisualMode()"></ion-toggle>
           </ion-item> -->
           <button
-            style="border-bottom: 1px solid #dedede;"
+            style="border-bottom: 1px solid #dedede"
             *ngIf="
               isCurrentWorkspaceOwner &&
               currentWorkspace.status.idStatus == 'VersionFinalPublica'
